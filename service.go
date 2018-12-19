@@ -27,7 +27,7 @@ import (
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/edgex-go/pkg/clients/types"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 )
 
 var (
@@ -127,7 +127,7 @@ func selfRegister() error {
 	ds, err := common.DeviceServiceClient.DeviceServiceForName(common.ServiceName)
 
 	if err != nil {
-		if _, ok := err.(types.ErrNotFound); ok {
+		if errsc, ok := err.(*types.ErrServiceClient); ok && (errsc.StatusCode == http.StatusNotFound) {
 			common.LoggingClient.Info(fmt.Sprintf("Device Service %s doesn't exist, creating a new one", ds.Name))
 			ds, err = createNewDeviceService()
 		} else {
@@ -183,7 +183,7 @@ func makeNewAddressable() (*models.Addressable, error) {
 	// check whether there has been an existing addressable
 	addr, err := common.AddressableClient.AddressableForName(common.ServiceName)
 	if err != nil {
-		if _, ok := err.(types.ErrNotFound); ok {
+		if errsc, ok := err.(*types.ErrServiceClient); ok && (errsc.StatusCode == http.StatusNotFound) {
 			common.LoggingClient.Info(fmt.Sprintf("Addressable %s doesn't exist, creating a new one", common.ServiceName))
 			millis := time.Now().UnixNano() / int64(time.Millisecond)
 			addr = models.Addressable{

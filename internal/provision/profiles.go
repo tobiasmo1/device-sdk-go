@@ -16,7 +16,7 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 	"gopkg.in/yaml.v2"
 )
 
@@ -158,7 +158,7 @@ func createDescriptor(name string, devObj models.DeviceObject) (*models.ValueDes
 		return nil, err
 	}
 
-	desc.Id = bson.ObjectIdHex(id)
+	desc.Id = id
 	common.LoggingClient.Debug(fmt.Sprintf("profiles: created Value Descriptor id: %s", id))
 
 	return desc, nil

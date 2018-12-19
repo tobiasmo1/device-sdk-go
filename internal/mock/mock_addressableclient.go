@@ -7,9 +7,11 @@
 package mock
 
 import (
+	"net/http"
+
 	"github.com/edgexfoundry/edgex-go/pkg/clients/types"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 )
 
 type AddressableClientMock struct {
@@ -27,7 +29,7 @@ func (AddressableClientMock) AddressableForName(name string) (models.Addressable
 	var addressable = models.Addressable{Id: bson.ObjectIdHex("5b977c62f37ba10e36673802"), Name: name}
 	var err error = nil
 	if name == "" {
-		err = types.ErrNotFound{}
+		err = types.NewErrServiceClient(http.StatusNotFound, nil)
 	}
 
 	return addressable, err
