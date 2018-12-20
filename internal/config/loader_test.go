@@ -16,7 +16,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
 )
 
 func TestCheckConsulUpReturnErrorOnTimeout(t *testing.T) {

@@ -10,10 +10,10 @@ package device
 import (
 	"fmt"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/device-sdk-go/internal/transformer"
-	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
+	"github.com/tobiasmo1/device-sdk-go/internal/cache"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
+	"github.com/tobiasmo1/device-sdk-go/internal/transformer"
+	ds_models "github.com/tobiasmo1/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
 )
 

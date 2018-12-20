@@ -15,8 +15,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
+	"github.com/tobiasmo1/device-sdk-go/internal/cache"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
 	"github.com/globalsign/mgo/bson"
 )
@@ -25,7 +25,7 @@ import (
 // Returns new Device id or non-nil error.
 func (s *Service) AddDevice(device models.Device) (id string, err error) {
 	if d, ok := cache.Devices().ForName(device.Name); ok {
-		return d.Id.Hex(), fmt.Errorf("name conflicted, Device %s exists", device.Name)
+		return d.Id/*.Hex()*/, fmt.Errorf("name conflicted, Device %s exists", device.Name)
 	}
 
 	common.LoggingClient.Debug(fmt.Sprintf("Adding managed device: : %v\n", device))
@@ -126,9 +126,9 @@ func (s *Service) RemoveDeviceByName(name string) error {
 // UpdateDevice updates the Device in the cache and ensures that the
 // copy in Core Metadata is also updated.
 func (s *Service) UpdateDevice(device models.Device) error {
-	_, ok := cache.Devices().ForId(device.Id.Hex())
+	_, ok := cache.Devices().ForId(device.Id/*.Hex()*/)
 	if !ok {
-		msg := fmt.Sprintf("Device %s cannot be found in cache", device.Id.Hex())
+		msg := fmt.Sprintf("Device %s cannot be found in cache", device.Id/*.Hex()*/)
 		common.LoggingClient.Error(msg)
 		return fmt.Errorf(msg)
 	}

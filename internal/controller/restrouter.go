@@ -10,7 +10,7 @@ package controller
 import (
 	"net/http"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
 	"github.com/gorilla/mux"
 )
 

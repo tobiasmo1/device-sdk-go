@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"time"
 
-	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
+	ds_models "github.com/tobiasmo1/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/edgex-go/pkg/clients/logging"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
 )

@@ -11,9 +11,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/device-sdk-go/internal/provision"
+	"github.com/tobiasmo1/device-sdk-go/internal/cache"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
+	"github.com/tobiasmo1/device-sdk-go/internal/provision"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
 	"github.com/globalsign/mgo/bson"
 )
@@ -22,7 +22,7 @@ import (
 // Returns new DeviceProfile id or non-nil error.
 func (s *Service) AddDeviceProfile(profile models.DeviceProfile) (id string, err error) {
 	if p, ok := cache.Profiles().ForName(profile.Name); ok {
-		return p.Id.Hex(), fmt.Errorf("name conflicted, Profile %s exists", profile.Name)
+		return p.Id/*.Hex()*/, fmt.Errorf("name conflicted, Profile %s exists", profile.Name)
 	}
 
 	common.LoggingClient.Debug(fmt.Sprintf("Adding managed Profile: : %v\n", profile))
@@ -96,9 +96,9 @@ func (*Service) RemoveDeviceProfileByName(name string) error {
 // UpdateDeviceProfile updates the DeviceProfile in the cache and ensures that the
 // copy in Core Metadata is also updated.
 func (*Service) UpdateDeviceProfile(profile models.DeviceProfile) error {
-	_, ok := cache.Profiles().ForId(profile.Id.Hex())
+	_, ok := cache.Profiles().ForId(profile.Id/*.Hex()*/)
 	if !ok {
-		msg := fmt.Sprintf("DeviceProfile %s cannot be found in cache", profile.Id.Hex())
+		msg := fmt.Sprintf("DeviceProfile %s cannot be found in cache", profile.Id/*.Hex()*/)
 		common.LoggingClient.Error(msg)
 		return fmt.Errorf(msg)
 	}

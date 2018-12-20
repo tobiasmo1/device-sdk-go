@@ -15,21 +15,22 @@ import (
 	"sync"
 	"time"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/device-sdk-go/internal/transformer"
-	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	"github.com/tobiasmo1/device-sdk-go/internal/cache"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
+	"github.com/tobiasmo1/device-sdk-go/internal/transformer"
+	ds_models "github.com/tobiasmo1/device-sdk-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
+	// TJM: TODO "github.com/ugorji/go/codec"
 )
 
 // Note, every HTTP request to ServeHTTP is made in a separate goroutine, which
 // means care needs to be taken with respect to shared data accessed through *Server.
-func CommandHandler(vars map[string]string, body string, method string) (*models.Event, common.AppError) {
+func CommandHandler(vars map[string]string, body string, method string) (*e_models.Event, common.AppError) {
 	dKey := vars["id"]
 	cmd := vars["command"]
 
 	var ok bool
-	var d models.Device
+	var d e_models.Device
 	if dKey != "" {
 		d, ok = cache.Devices().ForId(dKey)
 	} else {
@@ -76,8 +77,8 @@ func CommandHandler(vars map[string]string, body string, method string) (*models
 	}
 }
 
-func execReadCmd(device *models.Device, cmd string) (*models.Event, common.AppError) {
-	readings := make([]models.Reading, 0, common.CurrentConfig.Device.MaxCmdOps)
+func execReadCmd(device *e_models.Device, cmd string) (*e_models.Event, common.AppError) {
+	readings := make([]e_models.Reading, 0, common.CurrentConfig.Device.MaxCmdOps)
 
 	// make ResourceOperations
 	ros, err := cache.Profiles().ResourceOperations(device.Profile.Name, cmd, "get")
@@ -176,8 +177,12 @@ func execReadCmd(device *models.Device, cmd string) (*models.Event, common.AppEr
 		return nil, common.NewServerError(msg, nil)
 	}
 
+	// TJM: Transform Event (with Readings) to CBOR
+	common.LoggingClient.Error(fmt.Sprintf("TJM: Inject CBOR transformation for Event/Reading for dev: %s cmd: %s method: GET", device.Name, cmd))
+	// TJM: 
+
 	// push to Core Data
-	event := &models.Event{Device: device.Name, Readings: readings}
+	event := &e_models.Event{Device: device.Name, Readings: readings}
 	event.Origin = time.Now().UnixNano() / int64(time.Millisecond)
 	go common.SendEvent(event)
 
@@ -188,7 +193,7 @@ func execReadCmd(device *models.Device, cmd string) (*models.Event, common.AppEr
 	return event, nil
 }
 
-func execWriteCmd(device *models.Device, cmd string, params string) common.AppError {
+func execWriteCmd(device *e_models.Device, cmd string, params string) common.AppError {
 	ros, err := cache.Profiles().ResourceOperations(device.Profile.Name, cmd, "set")
 	if err != nil {
 		msg := fmt.Sprintf("Handler - execWriteCmd: can't find ResrouceOperations in Profile(%s) and Command(%s), %v", device.Profile.Name, cmd, err)
@@ -251,7 +256,7 @@ func execWriteCmd(device *models.Device, cmd string, params string) common.AppEr
 	return nil
 }
 
-func parseWriteParams(roMap map[string]*models.ResourceOperation, params string) ([]*ds_models.CommandValue, error) {
+func parseWriteParams(roMap map[string]*e_models.ResourceOperation, params string) ([]*ds_models.CommandValue, error) {
 	var paramMaps []map[string]string
 	err := json.Unmarshal([]byte(params), &paramMaps)
 	if err != nil {
@@ -289,15 +294,15 @@ func parseWriteParams(roMap map[string]*models.ResourceOperation, params string)
 	return result, nil
 }
 
-func roSliceToMap(ros []models.ResourceOperation) map[string]*models.ResourceOperation {
-	roMap := make(map[string]*models.ResourceOperation, len(ros))
+func roSliceToMap(ros []e_models.ResourceOperation) map[string]*e_models.ResourceOperation {
+	roMap := make(map[string]*e_models.ResourceOperation, len(ros))
 	for i, ro := range ros {
 		roMap[ro.Parameter] = &ros[i]
 	}
 	return roMap
 }
 
-func createCommandValueForParam(ro *models.ResourceOperation, v string) (*ds_models.CommandValue, error) {
+func createCommandValueForParam(ro *e_models.ResourceOperation, v string) (*ds_models.CommandValue, error) {
 	var result *ds_models.CommandValue
 	var err error
 	var value interface{}
@@ -374,7 +379,7 @@ func createCommandValueForParam(ro *models.ResourceOperation, v string) (*ds_mod
 	return result, err
 }
 
-func CommandAllHandler(cmd string, body string, method string) ([]*models.Event, common.AppError) {
+func CommandAllHandler(cmd string, body string, method string) ([]*e_models.Event, common.AppError) {
 	common.LoggingClient.Debug(fmt.Sprintf("Handler - CommandAll: execute the %s command %s from all operational devices", method, cmd))
 	devices := filterOperationalDevices(cache.Devices().All())
 
@@ -382,14 +387,14 @@ func CommandAllHandler(cmd string, body string, method string) ([]*models.Event,
 	var waitGroup sync.WaitGroup
 	waitGroup.Add(devCount)
 	cmdResults := make(chan struct {
-		event  *models.Event
+		event  *e_models.Event
 		appErr common.AppError
 	}, devCount)
 
 	for i, _ := range devices {
-		go func(device *models.Device) {
+		go func(device *e_models.Device) {
 			defer waitGroup.Done()
-			var event *models.Event = nil
+			var event *e_models.Event = nil
 			var appErr common.AppError = nil
 			if strings.ToLower(method) == "get" {
 				event, appErr = execReadCmd(device, cmd)
@@ -397,7 +402,7 @@ func CommandAllHandler(cmd string, body string, method string) ([]*models.Event,
 				appErr = execWriteCmd(device, cmd, body)
 			}
 			cmdResults <- struct {
-				event  *models.Event
+				event  *e_models.Event
 				appErr common.AppError
 			}{event, appErr}
 		}(devices[i])
@@ -406,7 +411,7 @@ func CommandAllHandler(cmd string, body string, method string) ([]*models.Event,
 	close(cmdResults)
 
 	errCount := 0
-	getResults := make([]*models.Event, 0, devCount)
+	getResults := make([]*e_models.Event, 0, devCount)
 	var appErr common.AppError
 	for r := range cmdResults {
 		if r.appErr != nil {
@@ -427,10 +432,10 @@ func CommandAllHandler(cmd string, body string, method string) ([]*models.Event,
 
 }
 
-func filterOperationalDevices(devices []models.Device) []*models.Device {
-	result := make([]*models.Device, 0, len(devices))
+func filterOperationalDevices(devices []e_models.Device) []*e_models.Device {
+	result := make([]*e_models.Device, 0, len(devices))
 	for i, d := range devices {
-		if (d.AdminState == models.Locked) || (d.OperatingState == models.Disabled) {
+		if (d.AdminState == e_models.Locked) || (d.OperatingState == e_models.Disabled) {
 			continue
 		}
 		result = append(result, &devices[i])

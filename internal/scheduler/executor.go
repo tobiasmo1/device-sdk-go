@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/device-sdk-go/internal/handler"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
+	"github.com/tobiasmo1/device-sdk-go/internal/handler"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
@@ -65,6 +65,9 @@ func execCmd(se *schEvtExec) {
 	if appErr != nil {
 		common.LoggingClient.Error(fmt.Sprintf("Schecule Event %s execution failed, AppErr: %v", se.schEvt.Name, appErr))
 		return
+	}
+	if se.schEvt.Name == "readSwitch" {
+		common.LoggingClient.Info(fmt.Sprintf("Transforming JSON payload to prepare application/cbor"))
 	}
 	common.LoggingClient.Debug(fmt.Sprintf("Schecule Event %s executed result- Event: %v, AppErr: %v", se.schEvt.Name, evt, appErr))
 }

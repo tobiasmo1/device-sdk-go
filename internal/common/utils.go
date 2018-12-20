@@ -13,9 +13,9 @@ import (
 	"net/http"
 	"time"
 
-	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
+	ds_models "github.com/tobiasmo1/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/edgex-go/pkg/clients/types"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 	"github.com/globalsign/mgo/bson"
 )
 
@@ -30,8 +30,8 @@ func BuildAddr(host string, port string) string {
 	return buffer.String()
 }
 
-func CommandValueToReading(cv *ds_models.CommandValue, devName string) *models.Reading {
-	reading := &models.Reading{Name: cv.RO.Parameter, Device: devName}
+func CommandValueToReading(cv *ds_models.CommandValue, devName string) *e_models.Reading {
+	reading := &e_models.Reading{Name: cv.RO.Parameter, Device: devName}
 	reading.Value = cv.ValueToString()
 
 	// if value has a non-zero Origin, use it
@@ -44,14 +44,14 @@ func CommandValueToReading(cv *ds_models.CommandValue, devName string) *models.R
 	return reading
 }
 
-func SendEvent(event *models.Event) {
+func SendEvent(event *e_models.Event) {
 	_, err := EventClient.Add(event)
 	if err != nil {
 		LoggingClient.Error(fmt.Sprintf("Failed to push event for device %s: %v", event.Device, err))
 	}
 }
 
-func CompareCommands(a []models.Command, b []models.Command) bool {
+func CompareCommands(a []e_models.Command, b []e_models.Command) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -65,7 +65,7 @@ func CompareCommands(a []models.Command, b []models.Command) bool {
 	return true
 }
 
-func CompareDevices(a models.Device, b models.Device) bool {
+func CompareDevices(a e_models.Device, b e_models.Device) bool {
 	labelsOk := CompareStrings(a.Labels, b.Labels)
 	profileOk := CompareDeviceProfiles(a.Profile, b.Profile)
 	serviceOk := CompareDeviceServices(a.Service, b.Service)
@@ -82,7 +82,7 @@ func CompareDevices(a models.Device, b models.Device) bool {
 		serviceOk
 }
 
-func CompareDeviceProfiles(a models.DeviceProfile, b models.DeviceProfile) bool {
+func CompareDeviceProfiles(a e_models.DeviceProfile, b e_models.DeviceProfile) bool {
 	labelsOk := CompareStrings(a.Labels, b.Labels)
 	cmdsOk := CompareCommands(a.Commands, b.Commands)
 	devResourcesOk := CompareDeviceResources(a.DeviceResources, b.DeviceResources)
@@ -102,7 +102,7 @@ func CompareDeviceProfiles(a models.DeviceProfile, b models.DeviceProfile) bool 
 		resourcesOk
 }
 
-func CompareDeviceResources(a []models.DeviceObject, b []models.DeviceObject) bool {
+func CompareDeviceResources(a []e_models.DeviceObject, b []e_models.DeviceObject) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -122,12 +122,12 @@ func CompareDeviceResources(a []models.DeviceObject, b []models.DeviceObject) bo
 	return true
 }
 
-func CompareDeviceServices(a models.DeviceService, b models.DeviceService) bool {
+func CompareDeviceServices(a e_models.DeviceService, b e_models.DeviceService) bool {
 	serviceOk := CompareServices(a.Service, b.Service)
 	return a.AdminState == b.AdminState && serviceOk
 }
 
-func CompareResources(a []models.ProfileResource, b []models.ProfileResource) bool {
+func CompareResources(a []e_models.ProfileResource, b []e_models.ProfileResource) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -144,7 +144,7 @@ func CompareResources(a []models.ProfileResource, b []models.ProfileResource) bo
 	return true
 }
 
-func CompareResourceOperations(a []models.ResourceOperation, b []models.ResourceOperation) bool {
+func CompareResourceOperations(a []e_models.ResourceOperation, b []e_models.ResourceOperation) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -168,7 +168,7 @@ func CompareResourceOperations(a []models.ResourceOperation, b []models.Resource
 	return true
 }
 
-func CompareServices(a models.Service, b models.Service) bool {
+func CompareServices(a e_models.Service, b e_models.Service) bool {
 	labelsOk := CompareStrings(a.Labels, b.Labels)
 
 	return a.DescribedObject == b.DescribedObject &&
@@ -209,7 +209,7 @@ func CompareStrStrMap(a map[string]string, b map[string]string) bool {
 	return true
 }
 
-func MakeAddressable(name string, addr *models.Addressable) (*models.Addressable, error) {
+func MakeAddressable(name string, addr *e_models.Addressable) (*e_models.Addressable, error) {
 	// check whether there has been an existing addressable
 	addressable, err := AddressableClient.AddressableForName(name)
 	if err != nil {

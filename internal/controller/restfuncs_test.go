@@ -16,8 +16,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/device-sdk-go/internal/mock"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
+	"github.com/tobiasmo1/device-sdk-go/internal/mock"
 	logger "github.com/edgexfoundry/edgex-go/pkg/clients/logging"
 	"github.com/gorilla/mux"
 )

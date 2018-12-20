@@ -11,9 +11,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/device-sdk-go/internal/provision"
+	"github.com/tobiasmo1/device-sdk-go/internal/cache"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
+	"github.com/tobiasmo1/device-sdk-go/internal/provision"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
@@ -55,7 +55,7 @@ func handleDevice(method string, id string) common.AppError {
 			err = cache.Profiles().Add(device.Profile)
 			if err == nil {
 				provision.CreateDescriptorsFromProfile(&device.Profile)
-				common.LoggingClient.Info(fmt.Sprintf("Added device profile %s", device.Profile.Id.Hex()))
+				common.LoggingClient.Info(fmt.Sprintf("Added device profile %s", device.Profile.Id/*.Hex()*/))
 			} else {
 				appErr := common.NewServerError(err.Error(), err)
 				common.LoggingClient.Error(fmt.Sprintf("Couldn't add device profile %s: %v", device.Profile.Name, err.Error()))

@@ -9,10 +9,10 @@ package provision
 
 import (
 	"fmt"
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
+	"github.com/tobiasmo1/device-sdk-go/internal/cache"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 	"github.com/globalsign/mgo/bson"
 )
 
@@ -26,7 +26,7 @@ func LoadSchedulesAndEvents(config *common.Config) error {
 	return err
 }
 
-func createSchedules(schedules []models.Schedule) error {
+func createSchedules(schedules []e_models.Schedule) error {
 	for i := 0; i < len(schedules); i++ {
 		schedule := schedules[i]
 
@@ -66,7 +66,7 @@ func isScheduleExist(scheduleName string) bool {
 	}
 }
 
-func createScheduleEvents(scheduleEvents []models.ScheduleEvent) error {
+func createScheduleEvents(scheduleEvents []e_models.ScheduleEvent) error {
 	for i := 0; i < len(scheduleEvents); i++ {
 		scheduleEvent := scheduleEvents[i]
 		if scheduleEvent.Service == "" {
@@ -102,7 +102,7 @@ func createScheduleEvents(scheduleEvents []models.ScheduleEvent) error {
 	return nil
 }
 
-func createScheduleEventAddressable(scheduleEvent *models.ScheduleEvent) error {
+func createScheduleEventAddressable(scheduleEvent *e_models.ScheduleEvent) error {
 	scheduleEvent.Addressable.Name = fmt.Sprintf("addressable-%v", scheduleEvent.Name)
 
 	if isScheduleEventAddressableExist(scheduleEvent.Addressable.Name) {

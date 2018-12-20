@@ -17,14 +17,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
-	"github.com/edgexfoundry/device-sdk-go/internal/clients"
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	configLoader "github.com/edgexfoundry/device-sdk-go/internal/config"
-	"github.com/edgexfoundry/device-sdk-go/internal/controller"
-	"github.com/edgexfoundry/device-sdk-go/internal/provision"
-	"github.com/edgexfoundry/device-sdk-go/internal/scheduler"
-	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
+	"github.com/tobiasmo1/device-sdk-go/internal/cache"
+	"github.com/tobiasmo1/device-sdk-go/internal/clients"
+	"github.com/tobiasmo1/device-sdk-go/internal/common"
+	configLoader "github.com/tobiasmo1/device-sdk-go/internal/config"
+	"github.com/tobiasmo1/device-sdk-go/internal/controller"
+	"github.com/tobiasmo1/device-sdk-go/internal/provision"
+	"github.com/tobiasmo1/device-sdk-go/internal/scheduler"
+	ds_models "github.com/tobiasmo1/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/edgex-go/pkg/clients/types"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
 	"github.com/globalsign/mgo/bson"
@@ -174,7 +174,7 @@ func createNewDeviceService() (models.DeviceService, error) {
 	// NOTE - this differs from Addressable and Device objects,
 	// neither of which require the '.Service'prefix
 	ds.Service.Id = bson.ObjectIdHex(id)
-	common.LoggingClient.Debug("New deviceservice Id: " + ds.Service.Id.Hex())
+	common.LoggingClient.Debug("New deviceservice Id: " + ds.Service.Id/*.Hex()*/)
 
 	return ds, nil
 }
