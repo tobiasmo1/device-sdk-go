@@ -70,7 +70,8 @@ func createDevice(dc common.DeviceConfig) error {
 	if err = common.VerifyIdFormat(id, "Device"); err != nil {
 		return err
 	}
-	device.Id = bson.ObjectIdHex(id)
+	// TJM: Is provisioning an appropriate layer to validate id or just remove BSON dependency altogether?
+	device.Id = bson.ObjectIdHex(id).Hex()
 	cache.Devices().Add(*device)
 
 	return nil

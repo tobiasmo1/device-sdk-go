@@ -44,7 +44,7 @@ func (dc *DeviceClientMock) Device(id string) (models.Device, error) {
 }
 
 func (dc *DeviceClientMock) DeviceForName(name string) (models.Device, error) {
-	var device = models.Device{Id: bson.ObjectIdHex("5b977c62f37ba10e36673802"), Name: name}
+	var device = models.Device{Id: bson.ObjectIdHex("5b977c62f37ba10e36673802").Hex(), Name: name}
 	var err error = nil
 	if name == "" {
 		err = errors.New("Item not found")

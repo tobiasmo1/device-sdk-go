@@ -228,7 +228,8 @@ func MakeAddressable(name string, addr *models.Addressable) (*models.Addressable
 			if err = VerifyIdFormat(id, "Addressable"); err != nil {
 				return nil, err
 			}
-			addressable.Id = bson.ObjectIdHex(id)
+			// TJM: Could validate string at appropriate wrapper layer, or just assign id here..
+			addressable.Id = bson.ObjectIdHex(id).Hex()
 		} else {
 			LoggingClient.Error(fmt.Sprintf("AddressableForName failed: %v", err))
 			return nil, err
