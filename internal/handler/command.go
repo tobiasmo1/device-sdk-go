@@ -20,6 +20,7 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/transformer"
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
+	// TJM: TODO "github.com/ugorji/go/codec"
 )
 
 // Note, every HTTP request to ServeHTTP is made in a separate goroutine, which
@@ -175,6 +176,10 @@ func execReadCmd(device *models.Device, cmd string) (*models.Event, common.AppEr
 		common.LoggingClient.Debug(fmt.Sprintf("Readings: %v", readings))
 		return nil, common.NewServerError(msg, nil)
 	}
+
+	// TJM: Transform Event (with Readings) to CBOR
+	common.LoggingClient.Error(fmt.Sprintf("TJM: Inject CBOR transformation for Event/Reading for dev: %s cmd: %s method: GET", device.Name, cmd))
+	// TJM: 
 
 	// push to Core Data
 	event := &models.Event{Device: device.Name, Readings: readings}

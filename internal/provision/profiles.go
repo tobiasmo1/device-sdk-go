@@ -85,7 +85,7 @@ func LoadProfiles(path string) error {
 				return err
 			}
 
-			profile.Id = bson.ObjectIdHex(id)
+			profile.Id = bson.ObjectIdHex(id).Hex()
 			cache.Profiles().Add(profile)
 			CreateDescriptorsFromProfile(&profile)
 		}
