@@ -1,7 +1,7 @@
 package: github.com/edgexfoundry/device-sdk-go
 import:
-- package: github.com/edgexfoundry/edgex-go
-  version: master
+- package: github.com/tobiasmo1/edgex-go
+  version: 905-decouple-mongodb-models
   subpackages:
   - /pkg/models
   - /pkg/clients/coredata
