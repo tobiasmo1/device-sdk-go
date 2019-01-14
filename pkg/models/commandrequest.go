@@ -6,13 +6,14 @@
 
 package models
 
-import "github.com/edgexfoundry/edgex-go/pkg/models"
+import e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 
+// CommandRequest is the composition of payload sent to a command
 type CommandRequest struct {
 	// RO is a ResourceOperation
-	RO models.ResourceOperation
+	RO e_models.ResourceOperation
 	// DeviceObject (aka device resource) represents the device resource
 	// to be read or set. It can be used to access the attributes map,
 	// PropertyValue, and PropertyUnit structs.
-	DeviceObject models.DeviceObject
+	DeviceObject e_models.DeviceObject
 }

@@ -10,7 +10,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 	"github.com/globalsign/mgo/bson"
 )
 
@@ -20,7 +20,7 @@ const (
 
 type DeviceClientMock struct{}
 
-func (dc *DeviceClientMock) Add(dev *models.Device) (string, error) {
+func (dc *DeviceClientMock) Add(dev *e_models.Device) (string, error) {
 	panic("implement me")
 }
 
@@ -32,19 +32,19 @@ func (dc *DeviceClientMock) DeleteByName(name string) error {
 	panic("implement me")
 }
 
-func (dc *DeviceClientMock) CheckForDevice(token string) (models.Device, error) {
+func (dc *DeviceClientMock) CheckForDevice(token string) (e_models.Device, error) {
 	panic("implement me")
 }
 
-func (dc *DeviceClientMock) Device(id string) (models.Device, error) {
+func (dc *DeviceClientMock) Device(id string) (e_models.Device, error) {
 	if id == invalidDeviceId {
-		return models.Device{}, fmt.Errorf("invalid id")
+		return e_models.Device{}, fmt.Errorf("invalid id")
 	}
-	return models.Device{}, nil
+	return e_models.Device{}, nil
 }
 
-func (dc *DeviceClientMock) DeviceForName(name string) (models.Device, error) {
-	var device = models.Device{Id: bson.ObjectIdHex("5b977c62f37ba10e36673802").Hex(), Name: name}
+func (dc *DeviceClientMock) DeviceForName(name string) (e_models.Device, error) {
+	var device = e_models.Device{Id: bson.ObjectIdHex("5b977c62f37ba10e36673802").Hex(), Name: name}
 	var err error = nil
 	if name == "" {
 		err = errors.New("Item not found")
@@ -53,39 +53,39 @@ func (dc *DeviceClientMock) DeviceForName(name string) (models.Device, error) {
 	return device, err
 }
 
-func (dc *DeviceClientMock) Devices() ([]models.Device, error) {
+func (dc *DeviceClientMock) Devices() ([]e_models.Device, error) {
 	panic("implement me")
 }
 
-func (dc *DeviceClientMock) DevicesByLabel(label string) ([]models.Device, error) {
+func (dc *DeviceClientMock) DevicesByLabel(label string) ([]e_models.Device, error) {
 	panic("implement me")
 }
 
-func (dc *DeviceClientMock) DevicesForAddressable(addressableid string) ([]models.Device, error) {
+func (dc *DeviceClientMock) DevicesForAddressable(addressableid string) ([]e_models.Device, error) {
 	panic("implement me")
 }
 
-func (dc *DeviceClientMock) DevicesForAddressableByName(addressableName string) ([]models.Device, error) {
+func (dc *DeviceClientMock) DevicesForAddressableByName(addressableName string) ([]e_models.Device, error) {
 	panic("implement me")
 }
 
-func (dc *DeviceClientMock) DevicesForProfile(profileid string) ([]models.Device, error) {
+func (dc *DeviceClientMock) DevicesForProfile(profileid string) ([]e_models.Device, error) {
 	panic("implement me")
 }
 
-func (dc *DeviceClientMock) DevicesForProfileByName(profileName string) ([]models.Device, error) {
+func (dc *DeviceClientMock) DevicesForProfileByName(profileName string) ([]e_models.Device, error) {
 	panic("implement me")
 }
 
-func (dc *DeviceClientMock) DevicesForService(serviceid string) ([]models.Device, error) {
+func (dc *DeviceClientMock) DevicesForService(serviceid string) ([]e_models.Device, error) {
 	panic("implement me")
 }
 
-func (dc *DeviceClientMock) DevicesForServiceByName(serviceName string) ([]models.Device, error) {
-	return []models.Device{}, nil
+func (dc *DeviceClientMock) DevicesForServiceByName(serviceName string) ([]e_models.Device, error) {
+	return []e_models.Device{}, nil
 }
 
-func (dc *DeviceClientMock) Update(dev models.Device) error {
+func (dc *DeviceClientMock) Update(dev e_models.Device) error {
 	return nil
 }
 

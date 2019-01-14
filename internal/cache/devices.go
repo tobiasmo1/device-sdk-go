@@ -10,56 +10,55 @@ package cache
 import (
 	"fmt"
 
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 var (
 	dc *deviceCache
 )
 
+// DeviceCache holds a set of devices
 type DeviceCache interface {
-	ForName(name string) (models.Device, bool)
-	ForId(id string) (models.Device, bool)
-	All() []models.Device
-	Add(device models.Device) error
-	Update(device models.Device) error
-	UpdateAddressable(addressable models.Addressable) error
+	ForName(name string) (e_models.Device, bool)
+	ForId(id string) (e_models.Device, bool)
+	All() []e_models.Device
+	Add(device e_models.Device) error
+	Update(device e_models.Device) error
+	UpdateAddressable(addressable e_models.Addressable) error
 	Remove(id string) error
 	RemoveByName(name string) error
-	UpdateAdminState(id string, state models.AdminState) error
+	UpdateAdminState(id string, state e_models.AdminState) error
 }
 
 type deviceCache struct {
-	dMap    map[string]*models.Device // key is Device name
-	nameMap map[string]string         // key is id, and value is Device name
+	dMap    map[string]*e_models.Device // key is Device name
+	nameMap map[string]string           // key is id, and value is Device name
 }
 
 // ForName returns a Device with the given name.
-func (d *deviceCache) ForName(name string) (models.Device, bool) {
+func (d *deviceCache) ForName(name string) (e_models.Device, bool) {
 	if device, ok := d.dMap[name]; ok {
 		return *device, ok
 	} else {
-		return models.Device{}, ok
+		return e_models.Device{}, ok
 	}
 }
 
 // ForId returns a device with the given device id.
-func (d *deviceCache) ForId(id string) (models.Device, bool) {
+func (d *deviceCache) ForId(id string) (e_models.Device, bool) {
 	name, ok := d.nameMap[id]
 	if !ok {
-		return models.Device{}, ok
+		return e_models.Device{}, ok
 	}
-
 	if device, ok := d.dMap[name]; ok {
 		return *device, ok
-	} else {
-		return models.Device{}, ok
 	}
+	return e_models.Device{}, ok
 }
 
 // All() returns the current list of devices in the cache.
-func (d *deviceCache) All() []models.Device {
-	devices := make([]models.Device, len(d.dMap))
+func (d *deviceCache) All() []e_models.Device {
+	devices := make([]e_models.Device, len(d.dMap))
 	i := 0
 	for _, device := range d.dMap {
 		devices[i] = *device
@@ -71,7 +70,7 @@ func (d *deviceCache) All() []models.Device {
 // Adds a new device to the cache. This method is used to populate the
 // devices cache with pre-existing devices from Core Metadata, as well
 // as create new devices returned in a ScanList during discovery.
-func (d *deviceCache) Add(device models.Device) error {
+func (d *deviceCache) Add(device e_models.Device) error {
 	if _, ok := d.dMap[device.Name]; ok {
 		return fmt.Errorf("device %s has already existed in cache", device.Name)
 	}
@@ -81,7 +80,7 @@ func (d *deviceCache) Add(device models.Device) error {
 }
 
 // Update updates the device in the cache
-func (d *deviceCache) Update(device models.Device) error {
+func (d *deviceCache) Update(device e_models.Device) error {
 	if err := d.Remove(device.Id); err != nil {
 		return err
 	}
@@ -89,7 +88,7 @@ func (d *deviceCache) Update(device models.Device) error {
 }
 
 // UpdateAddressable updates the device addressable in the cache
-func (d *deviceCache) UpdateAddressable(add models.Addressable) error {
+func (d *deviceCache) UpdateAddressable(add e_models.Addressable) error {
 	found := false
 	for _, device := range d.dMap {
 		if device.Addressable.Id == add.Id {
@@ -130,7 +129,7 @@ func (d *deviceCache) RemoveByName(name string) error {
 // UpdateAdminState updates the device admin state in cache by id. This method
 // is used by the UpdateHandler to trigger update device admin state that's been
 // updated directly to Core Metadata.
-func (d *deviceCache) UpdateAdminState(id string, state models.AdminState) error {
+func (d *deviceCache) UpdateAdminState(id string, state e_models.AdminState) error {
 	name, ok := d.nameMap[id]
 	if !ok {
 		return fmt.Errorf("device %s cannot be found in cache", id)
@@ -140,9 +139,9 @@ func (d *deviceCache) UpdateAdminState(id string, state models.AdminState) error
 	return nil
 }
 
-func newDeviceCache(devices []models.Device) DeviceCache {
+func newDeviceCache(devices []e_models.Device) DeviceCache {
 	defaultSize := len(devices) * 2
-	dMap := make(map[string]*models.Device, defaultSize)
+	dMap := make(map[string]*e_models.Device, defaultSize)
 	nameMap := make(map[string]string, defaultSize)
 	for i, d := range devices {
 		dMap[d.Name] = &devices[i]

@@ -11,11 +11,13 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/binary"
+	"github.com/ugorji/go/codec"
+
 	"fmt"
 	"io"
 	"strconv"
 
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 // ValueType indicates the type of value being passed back
@@ -61,10 +63,11 @@ const (
 	Float64
 )
 
+// CommandValue holds result of an invoked command
 type CommandValue struct {
 	// RO is a pointer to the ResourceOperation that triggered the
 	// CommandResult to be returned from the ProtocolDriver instance.
-	RO *models.ResourceOperation
+	RO *e_models.ResourceOperation
 	// Origin is an int64 value which indicates the time the reading
 	// contained in the CommandValue was read by the ProtocolDriver
 	// instance.
@@ -83,89 +86,91 @@ type CommandValue struct {
 	stringValue string
 }
 
-func NewBoolValue(ro *models.ResourceOperation, origin int64, value bool) (cv *CommandValue, err error) {
+// NewBoolValue prepares a CommandValue populated with a boolean value
+func NewBoolValue(ro *e_models.ResourceOperation, origin int64, value bool) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Bool}
 	err = encodeValue(cv, value)
 	return
 }
 
-func NewStringValue(ro *models.ResourceOperation, origin int64, value string) (cv *CommandValue) {
+// NewStringValue prepares a CommandValue populated with a string
+func NewStringValue(ro *e_models.ResourceOperation, origin int64, value string) (cv *CommandValue) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: String, stringValue: value}
 	return
 }
 
 // NewUint8Value creates a CommandValue of Type Uint8 with the given value.
-func NewUint8Value(ro *models.ResourceOperation, origin int64, value uint8) (cv *CommandValue, err error) {
+func NewUint8Value(ro *e_models.ResourceOperation, origin int64, value uint8) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Uint8}
 	err = encodeValue(cv, value)
 	return
 }
 
 // NewUint16Value creates a CommandValue of Type Uint16 with the given value.
-func NewUint16Value(ro *models.ResourceOperation, origin int64, value uint16) (cv *CommandValue, err error) {
+func NewUint16Value(ro *e_models.ResourceOperation, origin int64, value uint16) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Uint16}
 	err = encodeValue(cv, value)
 	return
 }
 
 // NewUint32Value creates a CommandValue of Type Uint32 with the given value.
-func NewUint32Value(ro *models.ResourceOperation, origin int64, value uint32) (cv *CommandValue, err error) {
+func NewUint32Value(ro *e_models.ResourceOperation, origin int64, value uint32) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Uint32}
 	err = encodeValue(cv, value)
 	return
 }
 
 // NewUint64Value creates a CommandValue of Type Uint64 with the given value.
-func NewUint64Value(ro *models.ResourceOperation, origin int64, value uint64) (cv *CommandValue, err error) {
+func NewUint64Value(ro *e_models.ResourceOperation, origin int64, value uint64) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Uint64}
 	err = encodeValue(cv, value)
 	return
 }
 
 // NewInt8Value creates a CommandValue of Type Int8 with the given value.
-func NewInt8Value(ro *models.ResourceOperation, origin int64, value int8) (cv *CommandValue, err error) {
+func NewInt8Value(ro *e_models.ResourceOperation, origin int64, value int8) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Int8}
 	err = encodeValue(cv, value)
 	return
 }
 
 // NewInt16Value creates a CommandValue of Type Int16 with the given value.
-func NewInt16Value(ro *models.ResourceOperation, origin int64, value int16) (cv *CommandValue, err error) {
+func NewInt16Value(ro *e_models.ResourceOperation, origin int64, value int16) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Int16}
 	err = encodeValue(cv, value)
 	return
 }
 
 // NewInt32Value creates a CommandValue of Type Int32 with the given value.
-func NewInt32Value(ro *models.ResourceOperation, origin int64, value int32) (cv *CommandValue, err error) {
+func NewInt32Value(ro *e_models.ResourceOperation, origin int64, value int32) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Int32}
 	err = encodeValue(cv, value)
 	return
 }
 
 // NewInt64Value creates a CommandValue of Type Int64 with the given value.
-func NewInt64Value(ro *models.ResourceOperation, origin int64, value int64) (cv *CommandValue, err error) {
+func NewInt64Value(ro *e_models.ResourceOperation, origin int64, value int64) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Int64}
 	err = encodeValue(cv, value)
 	return
 }
 
 // NewFloat32Value creates a CommandValue of Type Float32 with the given value.
-func NewFloat32Value(ro *models.ResourceOperation, origin int64, value float32) (cv *CommandValue, err error) {
+func NewFloat32Value(ro *e_models.ResourceOperation, origin int64, value float32) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Float32}
 	err = encodeValue(cv, value)
 	return
 }
 
 // NewFloat64Value creates a CommandValue of Type Float64 with the given value.
-func NewFloat64Value(ro *models.ResourceOperation, origin int64, value float64) (cv *CommandValue, err error) {
+func NewFloat64Value(ro *e_models.ResourceOperation, origin int64, value float64) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: Float64}
 	err = encodeValue(cv, value)
 	return
 }
 
 //NewCommandValue create a CommandValue according to the Type supplied
-func NewCommandValue(ro *models.ResourceOperation, origin int64, value interface{}, t ValueType) (cv *CommandValue, err error) {
+func NewCommandValue(ro *e_models.ResourceOperation, origin int64, value interface{}, t ValueType) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: t}
 	if t != String {
 		err = encodeValue(cv, value)
@@ -177,7 +182,13 @@ func NewCommandValue(ro *models.ResourceOperation, origin int64, value interface
 
 func encodeValue(cv *CommandValue, value interface{}) error {
 	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.BigEndian, value)
+	hCbor := new(codec.CborHandle)
+	enc := codec.NewEncoder(buf, hCbor)
+	err := enc.Encode(value)
+	/*
+		buf := new(bytes.Buffer)
+		err := binary.Write(buf, binary.BigEndian, value)
+	*/
 	if err == nil {
 		cv.NumericValue = buf.Bytes()
 	}

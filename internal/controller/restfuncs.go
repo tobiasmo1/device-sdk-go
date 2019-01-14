@@ -16,7 +16,7 @@ import (
 
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	"github.com/edgexfoundry/device-sdk-go/internal/handler"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 	"github.com/gorilla/mux"
 )
 
@@ -63,7 +63,7 @@ func callbackFunc(w http.ResponseWriter, req *http.Request) {
 
 	defer req.Body.Close()
 	dec := json.NewDecoder(req.Body)
-	cbAlert := models.CallbackAlert{}
+	cbAlert := e_models.CallbackAlert{}
 
 	err := dec.Decode(&cbAlert)
 	if err != nil {

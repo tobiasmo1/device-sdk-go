@@ -10,7 +10,7 @@ package common
 import (
 	"fmt"
 
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 // ServiceInfo is a struct which contains service related configuration
@@ -126,9 +126,9 @@ type Config struct {
 	// Logging contains logging-specific configuration settings.
 	Logging LoggingInfo
 	// Schedules is created on startup.
-	Schedules []models.Schedule
+	Schedules []e_models.Schedule
 	// SchedulesEvents is created on startup.
-	ScheduleEvents []models.ScheduleEvent
+	ScheduleEvents []e_models.ScheduleEvent
 	// Watchers is a map provisionwatchers to be created on startup.
 	Watchers map[string]WatcherInfo
 	// DeviceList is the list of pre-define Devices
@@ -146,7 +146,7 @@ type DeviceConfig struct {
 	// Other labels applied to the device to help with searching
 	Labels []string
 	// Addressable for the device - stores information about it's address
-	Addressable models.Addressable
+	Addressable e_models.Addressable
 }
 
 // ClientInfo provides the host and port of another service in the eco-system.

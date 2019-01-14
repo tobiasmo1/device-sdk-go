@@ -5,7 +5,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// This package provides a basic EdgeX Foundry device service implementation
+// Package device provides a basic EdgeX Foundry device service implementation
 // meant to be embedded in an application, similar in approach to the builtin
 // net/http package.
 package device
@@ -26,7 +26,7 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/scheduler"
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/edgex-go/pkg/clients/types"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 var (
@@ -143,15 +143,15 @@ func selfRegister() error {
 	return nil
 }
 
-func createNewDeviceService() (models.DeviceService, error) {
+func createNewDeviceService() (e_models.DeviceService, error) {
 	addr, err := makeNewAddressable()
 	if err != nil {
 		common.LoggingClient.Error(fmt.Sprintf("makeNewAddressable failed: %v", err))
-		return models.DeviceService{}, err
+		return e_models.DeviceService{}, err
 	}
 	millis := time.Now().UnixNano() / int64(time.Millisecond)
-	ds := models.DeviceService{
-		Service: models.Service{
+	ds := e_models.DeviceService{
+		Service: e_models.Service{
 			Name:           common.ServiceName,
 			Labels:         svc.svcInfo.Labels,
 			OperatingState: "ENABLED",
@@ -164,10 +164,10 @@ func createNewDeviceService() (models.DeviceService, error) {
 	id, err := common.DeviceServiceClient.Add(&ds)
 	if err != nil {
 		common.LoggingClient.Error(fmt.Sprintf("Add Deviceservice: %s; failed: %v", common.ServiceName, err))
-		return models.DeviceService{}, err
+		return e_models.DeviceService{}, err
 	}
 	if err = common.VerifyIdFormat(id, "Device Service"); err != nil {
-		return models.DeviceService{}, err
+		return e_models.DeviceService{}, err
 	}
 
 	// NOTE - this differs from Addressable and Device objects,
@@ -178,15 +178,15 @@ func createNewDeviceService() (models.DeviceService, error) {
 	return ds, nil
 }
 
-func makeNewAddressable() (*models.Addressable, error) {
+func makeNewAddressable() (*e_models.Addressable, error) {
 	// check whether there has been an existing addressable
 	addr, err := common.AddressableClient.AddressableForName(common.ServiceName)
 	if err != nil {
 		if errsc, ok := err.(*types.ErrServiceClient); ok && (errsc.StatusCode == http.StatusNotFound) {
 			common.LoggingClient.Info(fmt.Sprintf("Addressable %s doesn't exist, creating a new one", common.ServiceName))
 			millis := time.Now().UnixNano() / int64(time.Millisecond)
-			addr = models.Addressable{
-				BaseObject: models.BaseObject{
+			addr = e_models.Addressable{
+				BaseObject: e_models.BaseObject{
 					Origin: millis,
 				},
 				Name:       common.ServiceName,

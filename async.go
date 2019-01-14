@@ -14,7 +14,7 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	"github.com/edgexfoundry/device-sdk-go/internal/transformer"
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 // processAsyncResults processes readings that are pushed from
@@ -23,7 +23,7 @@ import (
 func processAsyncResults() {
 	for !svc.stopped {
 		acv := <-svc.asyncCh
-		readings := make([]models.Reading, 0, len(acv.CommandValues))
+		readings := make([]e_models.Reading, 0, len(acv.CommandValues))
 
 		device, ok := cache.Devices().ForName(acv.DeviceName)
 		if !ok {
@@ -67,7 +67,7 @@ func processAsyncResults() {
 		}
 
 		// push to Core Data
-		event := &models.Event{Device: acv.DeviceName, Readings: readings}
+		event := &e_models.Event{Device: acv.DeviceName, Readings: readings}
 		_, err := common.EventClient.Add(event)
 		if err != nil {
 			common.LoggingClient.Error(fmt.Sprintf("processAsyncResults - Failed to push event %v: %v", event, err))

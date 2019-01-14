@@ -9,12 +9,12 @@ package mock
 import (
 	"errors"
 
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 type ScheduleEventClientMock struct{}
 
-func (ScheduleEventClientMock) Add(dev *models.ScheduleEvent) (string, error) {
+func (ScheduleEventClientMock) Add(dev *e_models.ScheduleEvent) (string, error) {
 	return "", nil
 }
 
@@ -26,12 +26,12 @@ func (ScheduleEventClientMock) DeleteByName(name string) error {
 	panic("implement me")
 }
 
-func (ScheduleEventClientMock) ScheduleEvent(id string) (models.ScheduleEvent, error) {
+func (ScheduleEventClientMock) ScheduleEvent(id string) (e_models.ScheduleEvent, error) {
 	panic("implement me")
 }
 
-func (ScheduleEventClientMock) ScheduleEventForName(name string) (models.ScheduleEvent, error) {
-	var scheduleEvent = models.ScheduleEvent{Name: name}
+func (ScheduleEventClientMock) ScheduleEventForName(name string) (e_models.ScheduleEvent, error) {
+	var scheduleEvent = e_models.ScheduleEvent{Name: name}
 	var err error = nil
 	if name == "" {
 		err = errors.New("scheduleEvent not exist")
@@ -39,22 +39,22 @@ func (ScheduleEventClientMock) ScheduleEventForName(name string) (models.Schedul
 	return scheduleEvent, err
 }
 
-func (ScheduleEventClientMock) ScheduleEvents() ([]models.ScheduleEvent, error) {
+func (ScheduleEventClientMock) ScheduleEvents() ([]e_models.ScheduleEvent, error) {
 	panic("implement me")
 }
 
-func (ScheduleEventClientMock) ScheduleEventsForAddressable(name string) ([]models.ScheduleEvent, error) {
+func (ScheduleEventClientMock) ScheduleEventsForAddressable(name string) ([]e_models.ScheduleEvent, error) {
 	panic("implement me")
 }
 
-func (ScheduleEventClientMock) ScheduleEventsForAddressableByName(name string) ([]models.ScheduleEvent, error) {
+func (ScheduleEventClientMock) ScheduleEventsForAddressableByName(name string) ([]e_models.ScheduleEvent, error) {
 	panic("implement me")
 }
 
-func (ScheduleEventClientMock) ScheduleEventsForServiceByName(name string) ([]models.ScheduleEvent, error) {
-	return []models.ScheduleEvent{}, nil
+func (ScheduleEventClientMock) ScheduleEventsForServiceByName(name string) ([]e_models.ScheduleEvent, error) {
+	return []e_models.ScheduleEvent{}, nil
 }
 
-func (ScheduleEventClientMock) Update(dev models.ScheduleEvent) error {
+func (ScheduleEventClientMock) Update(dev e_models.ScheduleEvent) error {
 	panic("implement me")
 }

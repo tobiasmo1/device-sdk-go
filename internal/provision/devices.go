@@ -13,7 +13,7 @@ import (
 
 	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 	"github.com/globalsign/mgo/bson"
 )
 
@@ -50,14 +50,14 @@ func createDevice(dc common.DeviceConfig) error {
 	}
 
 	millis := time.Now().UnixNano() / int64(time.Millisecond)
-	device := &models.Device{
+	device := &e_models.Device{
 		Name:           dc.Name,
 		Profile:        prf,
 		Addressable:    *addr,
 		Labels:         dc.Labels,
 		Service:        common.CurrentDeviceService,
-		AdminState:     models.Unlocked,
-		OperatingState: models.Enabled,
+		AdminState:     e_models.Unlocked,
+		OperatingState: e_models.Enabled,
 	}
 	device.Origin = millis
 	device.Description = dc.Description
@@ -72,7 +72,7 @@ func createDevice(dc common.DeviceConfig) error {
 	}
 	// TJM: Is provisioning an appropriate layer to validate id or just remove BSON dependency altogether?
 	device.Id = bson.ObjectIdHex(id).Hex()
-	cache.Devices().Add(*device)
+	err = cache.Devices().Add(*device)
 
-	return nil
+	return err
 }

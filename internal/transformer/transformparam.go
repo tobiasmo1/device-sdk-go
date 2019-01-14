@@ -13,10 +13,10 @@ import (
 
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
-func TransformWriteParameter(cv *ds_models.CommandValue, pv models.PropertyValue) error {
+func TransformWriteParameter(cv *ds_models.CommandValue, pv e_models.PropertyValue) error {
 	var err error
 	if cv.Type == ds_models.String || cv.Type == ds_models.Bool {
 		return nil // do nothing for String and Bool
