@@ -1,6 +1,9 @@
 *~
 *.log
 example/cmd/device-simple/device-simple
+example/cmd/device-simple/device-simple/debug
 glide.lock
 vendor
 .idea
+/.project
+.vscode/
