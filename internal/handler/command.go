@@ -180,7 +180,6 @@ func execReadCmd(device *e_models.Device, cmd string) (*e_models.Event, common.A
 
 	// TJM: Transform Event (with Readings) to CBOR
 	common.LoggingClient.Error(fmt.Sprintf("TJM: Inject CBOR transformation for Event/Reading for dev: %s cmd: %s method: GET", device.Name, cmd))
-	// TJM:
 
 	// push to Core Data
 	event := &e_models.Event{Device: device.Name, Readings: readings}

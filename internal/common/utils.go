@@ -232,10 +232,6 @@ func MakeAddressable(name string, addr *e_models.Addressable) (*e_models.Address
 			if err = VerifyIdFormat(id, "Addressable"); err != nil {
 				return nil, err
 			}
-<<<<<<< 26d17496433254eb5129c1da2e49ed4fa355eaa9
-=======
-			// TJM: Could validate string at appropriate wrapper layer, or just assign id here..
->>>>>>> - Adds consistent of "e_models" to reference edgex-go/pkg/models; and "logger"
 			addressable.Id = id
 		} else {
 			LoggingClient.Error(fmt.Sprintf("AddressableForName failed: %v", err))
