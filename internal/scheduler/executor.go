@@ -16,7 +16,7 @@ import (
 
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	"github.com/edgexfoundry/device-sdk-go/internal/handler"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 const (
@@ -25,8 +25,8 @@ const (
 )
 
 type schEvtExec struct {
-	sch    models.Schedule
-	schEvt models.ScheduleEvent
+	sch    e_models.Schedule
+	schEvt e_models.ScheduleEvent
 }
 
 func (se *schEvtExec) Run() {
@@ -66,7 +66,7 @@ func execCmd(se *schEvtExec) {
 		common.LoggingClient.Error(fmt.Sprintf("Schecule Event %s execution failed, AppErr: %v", se.schEvt.Name, appErr))
 		return
 	}
-	common.LoggingClient.Debug(fmt.Sprintf("Schecule Event %s executed result- Event: %v, AppErr: %v", se.schEvt.Name, evt, appErr))
+	common.LoggingClient.Debug(fmt.Sprintf("Schecule Event %s executed result- Event: %v, AppErr: %v", se.schEvt.Schedule, evt, appErr))
 }
 
 func parseCmdPath(path string) (deviceName string, cmdName string, err error) {

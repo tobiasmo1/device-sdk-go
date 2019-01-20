@@ -9,14 +9,15 @@ package cache
 
 import (
 	"fmt"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 type ScheduleCache interface {
-	ForName(name string) (models.Schedule, bool)
-	All() []models.Schedule
-	Add(sch models.Schedule) error
-	Update(sch models.Schedule) error
+	ForName(name string) (e_models.Schedule, bool)
+	All() []e_models.Schedule
+	Add(sch e_models.Schedule) error
+	Update(sch e_models.Schedule) error
 	Remove(id string) error
 	RemoveByName(name string) error
 }
@@ -29,17 +30,17 @@ var (
 // usually loaded from Core Metadata, and existing scheduleCache
 // Schedules can be used to seed this cache.
 type scheduleCache struct {
-	scMap   map[string]models.Schedule // key is Schedule name
-	nameMap map[string]string          // key is id, and value is Schedule name
+	scMap   map[string]e_models.Schedule // key is Schedule name
+	nameMap map[string]string            // key is id, and value is Schedule name
 }
 
-func (s *scheduleCache) ForName(name string) (models.Schedule, bool) {
+func (s *scheduleCache) ForName(name string) (e_models.Schedule, bool) {
 	sc, ok := s.scMap[name]
 	return sc, ok
 }
 
-func (s *scheduleCache) All() []models.Schedule {
-	sches := make([]models.Schedule, len(s.scMap))
+func (s *scheduleCache) All() []e_models.Schedule {
+	sches := make([]e_models.Schedule, len(s.scMap))
 	i := 0
 	for _, sch := range s.scMap {
 		sches[i] = sch
@@ -48,7 +49,7 @@ func (s *scheduleCache) All() []models.Schedule {
 	return sches
 }
 
-func (s *scheduleCache) Add(sch models.Schedule) error {
+func (s *scheduleCache) Add(sch e_models.Schedule) error {
 	if _, ok := s.scMap[sch.Name]; ok {
 		return fmt.Errorf("schedule %s has already existed in cache", sch.Name)
 	}
@@ -57,7 +58,7 @@ func (s *scheduleCache) Add(sch models.Schedule) error {
 	return nil
 }
 
-func (s *scheduleCache) Update(sch models.Schedule) error {
+func (s *scheduleCache) Update(sch e_models.Schedule) error {
 	if err := s.Remove(sch.Id.Hex()); err != nil {
 		return err
 	}
@@ -86,7 +87,7 @@ func (s *scheduleCache) RemoveByName(name string) error {
 }
 
 // Creates a singleton Schedule Cache instance.
-func newScheduleCache(schMap map[string]models.Schedule) ScheduleCache {
+func newScheduleCache(schMap map[string]e_models.Schedule) ScheduleCache {
 	nameMap := make(map[string]string, len(schMap)*2)
 	for _, sc := range schMap {
 		nameMap[sc.Id.Hex()] = sc.Name

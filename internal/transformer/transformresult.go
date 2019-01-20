@@ -10,13 +10,13 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"math"
 	"strconv"
 
+	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 const (
@@ -25,7 +25,7 @@ const (
 	defaultOffset string = "0.0"
 )
 
-func TransformReadResult(cv *ds_models.CommandValue, pv models.PropertyValue) error {
+func TransformReadResult(cv *ds_models.CommandValue, pv e_models.PropertyValue) error {
 	if cv.Type == ds_models.String || cv.Type == ds_models.Bool {
 		return nil // do nothing for String and Bool
 	}
@@ -358,11 +358,11 @@ func replaceNewCommandValue(cv *ds_models.CommandValue, newValue interface{}) er
 	return err
 }
 
-func CheckAssertion(cv *ds_models.CommandValue, assertion string, device *models.Device) error {
+func CheckAssertion(cv *ds_models.CommandValue, assertion string, device *e_models.Device) error {
 	if assertion != "" && cv.ValueToString() != assertion {
-		device.OperatingState = models.Disabled
+		device.OperatingState = e_models.Disabled
 		cache.Devices().Update(*device)
-		go common.DeviceClient.UpdateOpStateByName(device.Name, models.Disabled)
+		go common.DeviceClient.UpdateOpStateByName(device.Name, e_models.Disabled)
 		msg := fmt.Sprintf("assertion (%s) failed with value: %s", assertion, cv.ValueToString())
 		common.LoggingClient.Error(msg)
 		return fmt.Errorf(msg)

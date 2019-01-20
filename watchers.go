@@ -9,11 +9,11 @@ package device
 import (
 	"sync"
 
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 type Watchers struct {
-	devices map[string]models.Device
+	devices map[string]e_models.Device
 }
 
 var (

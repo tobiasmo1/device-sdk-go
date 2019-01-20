@@ -14,15 +14,14 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	"github.com/edgexfoundry/device-sdk-go/internal/provision"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
-	"github.com/globalsign/mgo/bson"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 // AddDeviceProfile adds a new DeviceProfile to the device service and Core Metadata
 // Returns new DeviceProfile id or non-nil error.
-func (s *Service) AddDeviceProfile(profile models.DeviceProfile) (id string, err error) {
+func (s *Service) AddDeviceProfile(profile e_models.DeviceProfile) (id string, err error) {
 	if p, ok := cache.Profiles().ForName(profile.Name); ok {
-		return p.Id.Hex(), fmt.Errorf("name conflicted, Profile %s exists", profile.Name)
+		return p.Id, fmt.Errorf("name conflicted, Profile %s exists", profile.Name)
 	}
 
 	common.LoggingClient.Debug(fmt.Sprintf("Adding managed Profile: : %v\n", profile))
@@ -38,16 +37,16 @@ func (s *Service) AddDeviceProfile(profile models.DeviceProfile) (id string, err
 	if err = common.VerifyIdFormat(id, "Device Profile"); err != nil {
 		return "", err
 	}
-	profile.Id = bson.ObjectIdHex(id)
-	cache.Profiles().Add(profile)
+	profile.Id = id
+	err = cache.Profiles().Add(profile)
 
 	provision.CreateDescriptorsFromProfile(&profile)
 
-	return id, nil
+	return id, err
 }
 
 // DeviceProfiles return all managed DeviceProfiles from cache
-func (s *Service) DeviceProfiles() []models.DeviceProfile {
+func (s *Service) DeviceProfiles() []e_models.DeviceProfile {
 	return cache.Profiles().All()
 }
 
@@ -95,10 +94,10 @@ func (*Service) RemoveDeviceProfileByName(name string) error {
 
 // UpdateDeviceProfile updates the DeviceProfile in the cache and ensures that the
 // copy in Core Metadata is also updated.
-func (*Service) UpdateDeviceProfile(profile models.DeviceProfile) error {
-	_, ok := cache.Profiles().ForId(profile.Id.Hex())
+func (*Service) UpdateDeviceProfile(profile e_models.DeviceProfile) error {
+	_, ok := cache.Profiles().ForId(profile.Id)
 	if !ok {
-		msg := fmt.Sprintf("DeviceProfile %s cannot be found in cache", profile.Id.Hex())
+		msg := fmt.Sprintf("DeviceProfile %s cannot be found in cache", profile.Id)
 		common.LoggingClient.Error(msg)
 		return fmt.Errorf(msg)
 	}
@@ -118,7 +117,7 @@ func (*Service) UpdateDeviceProfile(profile models.DeviceProfile) error {
 
 // ResourceOperation retrieves the first matched ResourceOpereation instance from cache according to
 // the Device name, Device resource (object) name, and the method (get or set)
-func (*Service) ResourceOperation(deviceName string, object string, method string) (models.ResourceOperation, bool) {
+func (*Service) ResourceOperation(deviceName string, object string, method string) (e_models.ResourceOperation, bool) {
 	device, ok := cache.Devices().ForName(deviceName)
 	if !ok {
 		common.LoggingClient.Error(fmt.Sprintf("retrieving ResourceOperation - Device %s not found", deviceName))
@@ -134,7 +133,7 @@ func (*Service) ResourceOperation(deviceName string, object string, method strin
 
 // DeviceObject retrieves the specific DeviceObject instance from cache according to
 // the Device name and Device resource (object) name
-func (*Service) DeviceObject(deviceName string, object string, method string) (models.DeviceObject, bool) {
+func (*Service) DeviceObject(deviceName string, object string, method string) (e_models.DeviceObject, bool) {
 	device, ok := cache.Devices().ForName(deviceName)
 	if !ok {
 		common.LoggingClient.Error(fmt.Sprintf("retrieving DeviceObject - Device %s not found", deviceName))

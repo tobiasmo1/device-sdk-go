@@ -9,14 +9,15 @@ package cache
 
 import (
 	"fmt"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 type ScheduleEventCache interface {
-	ForName(name string) (models.ScheduleEvent, bool)
-	All() []models.ScheduleEvent
-	Add(schEvt models.ScheduleEvent) error
-	Update(schEvt models.ScheduleEvent) error
+	ForName(name string) (e_models.ScheduleEvent, bool)
+	All() []e_models.ScheduleEvent
+	Add(schEvt e_models.ScheduleEvent) error
+	Update(schEvt e_models.ScheduleEvent) error
 	Remove(id string) error
 	RemoveByName(name string) error
 }
@@ -29,17 +30,17 @@ var (
 // usually loaded from Core Metadata, and existing scheduleCache
 // ScheduleEvents can be used to seed this cache.
 type scheduleEventCache struct {
-	seMap   map[string]models.ScheduleEvent // key is ScheduleEvent name
-	nameMap map[string]string               // key is id, and value is ScheduleEvent name
+	seMap   map[string]e_models.ScheduleEvent // key is ScheduleEvent name
+	nameMap map[string]string                 // key is id, and value is ScheduleEvent name
 }
 
-func (s *scheduleEventCache) ForName(name string) (models.ScheduleEvent, bool) {
+func (s *scheduleEventCache) ForName(name string) (e_models.ScheduleEvent, bool) {
 	se, ok := s.seMap[name]
 	return se, ok
 }
 
-func (s *scheduleEventCache) All() []models.ScheduleEvent {
-	ses := make([]models.ScheduleEvent, len(s.seMap))
+func (s *scheduleEventCache) All() []e_models.ScheduleEvent {
+	ses := make([]e_models.ScheduleEvent, len(s.seMap))
 	i := 0
 	for _, schEvt := range s.seMap {
 		ses[i] = schEvt
@@ -48,7 +49,7 @@ func (s *scheduleEventCache) All() []models.ScheduleEvent {
 	return ses
 }
 
-func (s *scheduleEventCache) Add(schEvt models.ScheduleEvent) error {
+func (s *scheduleEventCache) Add(schEvt e_models.ScheduleEvent) error {
 	if _, ok := s.seMap[schEvt.Name]; ok {
 		return fmt.Errorf("schedule event %s has already existed in cache", schEvt.Name)
 	}
@@ -57,7 +58,7 @@ func (s *scheduleEventCache) Add(schEvt models.ScheduleEvent) error {
 	return nil
 }
 
-func (s *scheduleEventCache) Update(schEvt models.ScheduleEvent) error {
+func (s *scheduleEventCache) Update(schEvt e_models.ScheduleEvent) error {
 	if err := s.Remove(schEvt.Id.Hex()); err != nil {
 		return err
 	}
@@ -86,9 +87,9 @@ func (s *scheduleEventCache) RemoveByName(name string) error {
 }
 
 // Creates a singleton ScheduleEvent Cache instance.
-func newScheduleEventCache(schEvts []models.ScheduleEvent) ScheduleEventCache {
+func newScheduleEventCache(schEvts []e_models.ScheduleEvent) ScheduleEventCache {
 	defaultSize := len(schEvts) * 2
-	seMap := make(map[string]models.ScheduleEvent, defaultSize)
+	seMap := make(map[string]e_models.ScheduleEvent, defaultSize)
 	nameMap := make(map[string]string, defaultSize)
 	for _, se := range schEvts {
 		seMap[se.Name] = se

@@ -9,16 +9,16 @@ package common
 import (
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/edgex-go/pkg/clients/coredata"
-	"github.com/edgexfoundry/edgex-go/pkg/clients/logging"
+	logger "github.com/edgexfoundry/edgex-go/pkg/clients/logging"
 	"github.com/edgexfoundry/edgex-go/pkg/clients/metadata"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 var (
 	ServiceName           string
 	ServiceVersion        string
 	CurrentConfig         *Config
-	CurrentDeviceService  models.DeviceService
+	CurrentDeviceService  e_models.DeviceService
 	UseRegistry           bool
 	ServiceLocked         bool
 	Driver                ds_models.ProtocolDriver

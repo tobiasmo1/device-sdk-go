@@ -9,8 +9,10 @@ package cache
 
 import (
 	"fmt"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
 	"strings"
+
+	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 const (
@@ -23,45 +25,45 @@ var (
 )
 
 type ProfileCache interface {
-	ForName(name string) (models.DeviceProfile, bool)
-	ForId(id string) (models.DeviceProfile, bool)
-	All() []models.DeviceProfile
-	Add(profile models.DeviceProfile) error
-	Update(profile models.DeviceProfile) error
+	ForName(name string) (e_models.DeviceProfile, bool)
+	ForId(id string) (e_models.DeviceProfile, bool)
+	All() []e_models.DeviceProfile
+	Add(profile e_models.DeviceProfile) error
+	Update(profile e_models.DeviceProfile) error
 	Remove(id string) error
 	RemoveByName(name string) error
-	DeviceObject(profileName string, objectName string) (models.DeviceObject, bool)
+	DeviceObject(profileName string, objectName string) (e_models.DeviceObject, bool)
 	CommandExists(profileName string, cmd string) (bool, error)
-	ResourceOperations(profileName string, cmd string, method string) ([]models.ResourceOperation, error)
-	ResourceOperation(profileName string, object string, method string) (models.ResourceOperation, error)
+	ResourceOperations(profileName string, cmd string, method string) ([]e_models.ResourceOperation, error)
+	ResourceOperation(profileName string, object string, method string) (e_models.ResourceOperation, error)
 }
 
 type profileCache struct {
-	dpMap    map[string]models.DeviceProfile // key is DeviceProfile name
-	nameMap  map[string]string               // key is id, and value is DeviceProfile name
-	doMap    map[string]map[string]models.DeviceObject
-	getOpMap map[string]map[string][]models.ResourceOperation
-	setOpMap map[string]map[string][]models.ResourceOperation
-	cmdMap   map[string]map[string]models.Command
+	dpMap    map[string]e_models.DeviceProfile // key is DeviceProfile name
+	nameMap  map[string]string                 // key is id, and value is DeviceProfile name
+	doMap    map[string]map[string]e_models.DeviceObject
+	getOpMap map[string]map[string][]e_models.ResourceOperation
+	setOpMap map[string]map[string][]e_models.ResourceOperation
+	cmdMap   map[string]map[string]e_models.Command
 }
 
-func (p *profileCache) ForName(name string) (models.DeviceProfile, bool) {
+func (p *profileCache) ForName(name string) (e_models.DeviceProfile, bool) {
 	dp, ok := p.dpMap[name]
 	return dp, ok
 }
 
-func (p *profileCache) ForId(id string) (models.DeviceProfile, bool) {
+func (p *profileCache) ForId(id string) (e_models.DeviceProfile, bool) {
 	name, ok := p.nameMap[id]
 	if !ok {
-		return models.DeviceProfile{}, ok
+		return e_models.DeviceProfile{}, ok
 	}
 
 	dp, ok := p.dpMap[name]
 	return dp, ok
 }
 
-func (p *profileCache) All() []models.DeviceProfile {
-	ps := make([]models.DeviceProfile, len(p.dpMap))
+func (p *profileCache) All() []e_models.DeviceProfile {
+	ps := make([]e_models.DeviceProfile, len(p.dpMap))
 	i := 0
 	for _, profile := range p.dpMap {
 		ps[i] = profile
@@ -70,29 +72,29 @@ func (p *profileCache) All() []models.DeviceProfile {
 	return ps
 }
 
-func (p *profileCache) Add(profile models.DeviceProfile) error {
+func (p *profileCache) Add(profile e_models.DeviceProfile) error {
 	if _, ok := p.dpMap[profile.Name]; ok {
 		return fmt.Errorf("device profile %s has already existed in cache", profile.Name)
 	}
 	p.dpMap[profile.Name] = profile
-	p.nameMap[profile.Id.Hex()] = profile.Name
+	p.nameMap[profile.Id] = profile.Name
 	p.doMap[profile.Name] = deviceObjectSliceToMap(profile.DeviceResources)
 	p.getOpMap[profile.Name], p.setOpMap[profile.Name] = profileResourceSliceToMaps(profile.Resources)
 	p.cmdMap[profile.Name] = commandSliceToMap(profile.Commands)
 	return nil
 }
 
-func deviceObjectSliceToMap(deviceObjects []models.DeviceObject) map[string]models.DeviceObject {
-	result := make(map[string]models.DeviceObject, len(deviceObjects))
+func deviceObjectSliceToMap(deviceObjects []e_models.DeviceObject) map[string]e_models.DeviceObject {
+	result := make(map[string]e_models.DeviceObject, len(deviceObjects))
 	for _, do := range deviceObjects {
 		result[do.Name] = do
 	}
 	return result
 }
 
-func profileResourceSliceToMaps(profileResources []models.ProfileResource) (map[string][]models.ResourceOperation, map[string][]models.ResourceOperation) {
-	getResult := make(map[string][]models.ResourceOperation, len(profileResources))
-	setResult := make(map[string][]models.ResourceOperation, len(profileResources))
+func profileResourceSliceToMaps(profileResources []e_models.ProfileResource) (map[string][]e_models.ResourceOperation, map[string][]models.ResourceOperation) {
+	getResult := make(map[string][]e_models.ResourceOperation, len(profileResources))
+	setResult := make(map[string][]e_models.ResourceOperation, len(profileResources))
 	for _, pr := range profileResources {
 		if len(pr.Get) > 0 {
 			getResult[pr.Name] = pr.Get
@@ -104,16 +106,16 @@ func profileResourceSliceToMaps(profileResources []models.ProfileResource) (map[
 	return getResult, setResult
 }
 
-func commandSliceToMap(commands []models.Command) map[string]models.Command {
-	result := make(map[string]models.Command, len(commands))
+func commandSliceToMap(commands []e_models.Command) map[string]e_models.Command {
+	result := make(map[string]e_models.Command, len(commands))
 	for _, cmd := range commands {
 		result[cmd.Name] = cmd
 	}
 	return result
 }
 
-func (p *profileCache) Update(profile models.DeviceProfile) error {
-	if err := p.Remove(profile.Id.Hex()); err != nil {
+func (p *profileCache) Update(profile e_models.DeviceProfile) error {
+	if err := p.Remove(profile.Id); err != nil {
 		return err
 	}
 	return p.Add(profile)
@@ -135,7 +137,7 @@ func (p *profileCache) RemoveByName(name string) error {
 	}
 
 	delete(p.dpMap, name)
-	delete(p.nameMap, profile.Id.Hex())
+	delete(p.nameMap, profile.Id)
 	delete(p.doMap, name)
 	delete(p.getOpMap, name)
 	delete(p.setOpMap, name)
@@ -143,10 +145,10 @@ func (p *profileCache) RemoveByName(name string) error {
 	return nil
 }
 
-func (p *profileCache) DeviceObject(profileName string, objectName string) (models.DeviceObject, bool) {
+func (p *profileCache) DeviceObject(profileName string, objectName string) (e_models.DeviceObject, bool) {
 	objs, ok := p.doMap[profileName]
 	if !ok {
-		return models.DeviceObject{}, ok
+		return e_models.DeviceObject{}, ok
 	}
 
 	obj, ok := objs[objectName]
@@ -170,9 +172,9 @@ func (p *profileCache) CommandExists(profileName string, cmd string) (bool, erro
 }
 
 // Get ResourceOperations
-func (p *profileCache) ResourceOperations(profileName string, cmd string, method string) ([]models.ResourceOperation, error) {
-	var resOps []models.ResourceOperation
-	var rosMap map[string][]models.ResourceOperation
+func (p *profileCache) ResourceOperations(profileName string, cmd string, method string) ([]e_models.ResourceOperation, error) {
+	var resOps []e_models.ResourceOperation
+	var rosMap map[string][]e_models.ResourceOperation
 	var ok bool
 	if strings.ToLower(method) == getOpsStr {
 		if rosMap, ok = p.getOpMap[profileName]; !ok {
@@ -191,9 +193,9 @@ func (p *profileCache) ResourceOperations(profileName string, cmd string, method
 }
 
 // Return the first matched ResourceOperation
-func (p *profileCache) ResourceOperation(profileName string, object string, method string) (models.ResourceOperation, error) {
-	var ro models.ResourceOperation
-	var rosMap map[string][]models.ResourceOperation
+func (p *profileCache) ResourceOperation(profileName string, object string, method string) (e_models.ResourceOperation, error) {
+	var ro e_models.ResourceOperation
+	var rosMap map[string][]e_models.ResourceOperation
 	var ok bool
 	if strings.ToLower(method) == getOpsStr {
 		if rosMap, ok = p.getOpMap[profileName]; !ok {
@@ -211,7 +213,7 @@ func (p *profileCache) ResourceOperation(profileName string, object string, meth
 	return ro, nil
 }
 
-func retrieveFirstRObyObject(rosMap map[string][]models.ResourceOperation, object string) (models.ResourceOperation, bool) {
+func retrieveFirstRObyObject(rosMap map[string][]e_models.ResourceOperation, object string) (e_models.ResourceOperation, bool) {
 	for _, ros := range rosMap {
 		for _, ro := range ros {
 			if ro.Object == object {
@@ -219,20 +221,20 @@ func retrieveFirstRObyObject(rosMap map[string][]models.ResourceOperation, objec
 			}
 		}
 	}
-	return models.ResourceOperation{}, false
+	return e_models.ResourceOperation{}, false
 }
 
-func newProfileCache(profiles []models.DeviceProfile) ProfileCache {
+func newProfileCache(profiles []e_models.DeviceProfile) ProfileCache {
 	defaultSize := len(profiles) * 2
-	dpMap := make(map[string]models.DeviceProfile, defaultSize)
+	dpMap := make(map[string]e_models.DeviceProfile, defaultSize)
 	nameMap := make(map[string]string, defaultSize)
-	doMap := make(map[string]map[string]models.DeviceObject, defaultSize)
-	getOpMap := make(map[string]map[string][]models.ResourceOperation, defaultSize)
-	setOpMap := make(map[string]map[string][]models.ResourceOperation, defaultSize)
-	cmdMap := make(map[string]map[string]models.Command, defaultSize)
+	doMap := make(map[string]map[string]e_models.DeviceObject, defaultSize)
+	getOpMap := make(map[string]map[string][]e_models.ResourceOperation, defaultSize)
+	setOpMap := make(map[string]map[string][]e_models.ResourceOperation, defaultSize)
+	cmdMap := make(map[string]map[string]e_models.Command, defaultSize)
 	for _, dp := range profiles {
 		dpMap[dp.Name] = dp
-		nameMap[dp.Id.Hex()] = dp.Name
+		nameMap[dp.Id] = dp.Name
 		doMap[dp.Name] = deviceObjectSliceToMap(dp.DeviceResources)
 		getOpMap[dp.Name], setOpMap[dp.Name] = profileResourceSliceToMaps(dp.Resources)
 		cmdMap[dp.Name] = commandSliceToMap(dp.Commands)

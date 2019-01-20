@@ -13,8 +13,7 @@ import (
 
 	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
-	"github.com/globalsign/mgo/bson"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 func LoadDevices(deviceList []common.DeviceConfig) error {
@@ -50,14 +49,14 @@ func createDevice(dc common.DeviceConfig) error {
 	}
 
 	millis := time.Now().UnixNano() / int64(time.Millisecond)
-	device := &models.Device{
+	device := &e_models.Device{
 		Name:           dc.Name,
 		Profile:        prf,
 		Addressable:    *addr,
 		Labels:         dc.Labels,
 		Service:        common.CurrentDeviceService,
-		AdminState:     models.Unlocked,
-		OperatingState: models.Enabled,
+		AdminState:     e_models.Unlocked,
+		OperatingState: e_models.Enabled,
 	}
 	device.Origin = millis
 	device.Description = dc.Description
@@ -70,8 +69,8 @@ func createDevice(dc common.DeviceConfig) error {
 	if err = common.VerifyIdFormat(id, "Device"); err != nil {
 		return err
 	}
-	device.Id = bson.ObjectIdHex(id)
-	cache.Devices().Add(*device)
+	device.Id = id
+	err = cache.Devices().Add(*device)
 
-	return nil
+	return err
 }

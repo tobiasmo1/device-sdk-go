@@ -14,25 +14,25 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	"github.com/edgexfoundry/device-sdk-go/internal/provision"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
-func CallbackHandler(cbAlert models.CallbackAlert, method string) common.AppError {
+func CallbackHandler(cbAlert e_models.CallbackAlert, method string) common.AppError {
 	if (cbAlert.Id == "") || (cbAlert.ActionType == "") {
 		appErr := common.NewBadRequestError("Missing parameters", nil)
 		common.LoggingClient.Error(fmt.Sprintf("Missing callback parameters"))
 		return appErr
 	}
 
-	if cbAlert.ActionType == models.DEVICE {
+	if cbAlert.ActionType == e_models.DEVICE {
 		return handleDevice(method, cbAlert.Id)
-	} else if cbAlert.ActionType == models.ADDRESSABLE {
+	} else if cbAlert.ActionType == e_models.ADDRESSABLE {
 		return handleAddresssable(method, cbAlert.Id)
-	} else if cbAlert.ActionType == models.PROFILE {
+	} else if cbAlert.ActionType == e_models.PROFILE {
 		return handleProfile(method, cbAlert.Id)
-	} else if cbAlert.ActionType == models.SCHEDULE {
+	} else if cbAlert.ActionType == e_models.SCHEDULE {
 		return handleSchedule(method, cbAlert.Id)
-	} else if cbAlert.ActionType == models.SCHEDULEEVENT {
+	} else if cbAlert.ActionType == e_models.SCHEDULEEVENT {
 		return handleScheduleEvent(method, cbAlert.Id)
 	}
 
@@ -55,7 +55,7 @@ func handleDevice(method string, id string) common.AppError {
 			err = cache.Profiles().Add(device.Profile)
 			if err == nil {
 				provision.CreateDescriptorsFromProfile(&device.Profile)
-				common.LoggingClient.Info(fmt.Sprintf("Added device profile %s", device.Profile.Id.Hex()))
+				common.LoggingClient.Info(fmt.Sprintf("Added device profile %s", device.Profile.Id))
 			} else {
 				appErr := common.NewServerError(err.Error(), err)
 				common.LoggingClient.Error(fmt.Sprintf("Couldn't add device profile %s: %v", device.Profile.Name, err.Error()))

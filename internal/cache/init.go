@@ -11,31 +11,31 @@ import (
 	"sync"
 
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 var (
 	initOnce sync.Once
 )
 
-// Init basic state for cache
+// InitCache initializes the basic state of local caches
 func InitCache() {
 	initOnce.Do(func() {
 		vds, err := common.ValueDescriptorClient.ValueDescriptors()
 		if err != nil {
 			common.LoggingClient.Error(fmt.Sprintf("Value Descriptor cache initialization failed: %v", err))
-			vds = make([]models.ValueDescriptor, 0)
+			vds = make([]e_models.ValueDescriptor, 0)
 		}
 		newValueDescriptorCache(vds)
 
 		ds, err := common.DeviceClient.DevicesForServiceByName(common.ServiceName)
 		if err != nil {
 			common.LoggingClient.Error(fmt.Sprintf("Device cache initialization failed: %v", err))
-			ds = make([]models.Device, 0)
+			ds = make([]e_models.Device, 0)
 		}
 		newDeviceCache(ds)
 
-		dps := make([]models.DeviceProfile, len(ds))
+		dps := make([]e_models.DeviceProfile, len(ds))
 		for i, d := range ds {
 			dps[i] = d.Profile
 		}
@@ -44,11 +44,11 @@ func InitCache() {
 		ses, err := common.ScheduleEventClient.ScheduleEventsForServiceByName(common.ServiceName)
 		if err != nil {
 			common.LoggingClient.Error(fmt.Sprintf("Schedule Event cache initialization failed: %v", err))
-			ses = make([]models.ScheduleEvent, 0)
+			ses = make([]e_models.ScheduleEvent, 0)
 		}
 		newScheduleEventCache(ses)
 
-		schMap := make(map[string]models.Schedule, len(ses))
+		schMap := make(map[string]e_models.Schedule, len(ses))
 		for _, se := range ses {
 			if _, ok := schMap[se.Schedule]; !ok {
 				sc, err := common.ScheduleClient.ScheduleForName(se.Schedule)

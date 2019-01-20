@@ -5,15 +5,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// This package defines an interface used to build an EdgeX Foundry device
+// Package models defines an interface used to build an EdgeX Foundry device
 // service.  This interace provides an asbstraction layer for the device
 // or protocol specific logic of a device service.
 //
 package models
 
 import (
-	"github.com/edgexfoundry/edgex-go/pkg/clients/logging"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	logger "github.com/edgexfoundry/edgex-go/pkg/clients/logging"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 // ProtocolDriver is a low-level device-specific interface used by
@@ -31,7 +31,7 @@ type ProtocolDriver interface {
 	// how this gets tied by the driver code to an actual device. Maybe
 	// this should be *models.Device?
 	//
-	DisconnectDevice(address *models.Addressable) error
+	DisconnectDevice(address *e_models.Addressable) error
 
 	// Initialize performs protocol-specific initialization for the device
 	// service. The given *AsyncValues channel can be used to push asynchronous
@@ -40,13 +40,13 @@ type ProtocolDriver interface {
 
 	// HandleReadCommands passes a slice of CommandRequest struct each representing
 	// a ResourceOperation for a specific device resource (aka DeviceObject).
-	HandleReadCommands(addr *models.Addressable, reqs []CommandRequest) ([]*CommandValue, error)
+	HandleReadCommands(addr *e_models.Addressable, reqs []CommandRequest) ([]*CommandValue, error)
 
 	// HandleWriteCommands passes a slice of CommandRequest struct each representing
 	// a ResourceOperation for a specific device resource (aka DeviceObject).
 	// Since the commands are actuation commands, params provide parameters for the individual
 	// command.
-	HandleWriteCommands(addr *models.Addressable, reqs []CommandRequest, params []*CommandValue) error
+	HandleWriteCommands(addr *e_models.Addressable, reqs []CommandRequest, params []*CommandValue) error
 
 	// Stop instructs the protocol-specific DS code to shutdown gracefully, or
 	// if the force parameter is 'true', immediately. The driver is responsible
