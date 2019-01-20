@@ -54,12 +54,12 @@ func (s *scheduleCache) Add(sch e_models.Schedule) error {
 		return fmt.Errorf("schedule %s has already existed in cache", sch.Name)
 	}
 	s.scMap[sch.Name] = sch
-	s.nameMap[sch.Id] = sch.Name
+	s.nameMap[sch.Id.Hex()] = sch.Name
 	return nil
 }
 
 func (s *scheduleCache) Update(sch e_models.Schedule) error {
-	if err := s.Remove(sch.Id); err != nil {
+	if err := s.Remove(sch.Id.Hex()); err != nil {
 		return err
 	}
 	return s.Add(sch)
@@ -81,7 +81,7 @@ func (s *scheduleCache) RemoveByName(name string) error {
 		return fmt.Errorf("schedule %s does not exist in cache", name)
 	}
 
-	delete(s.nameMap, sch.Id)
+	delete(s.nameMap, sch.Id.Hex())
 	delete(s.scMap, name)
 	return nil
 }
@@ -90,7 +90,7 @@ func (s *scheduleCache) RemoveByName(name string) error {
 func newScheduleCache(schMap map[string]e_models.Schedule) ScheduleCache {
 	nameMap := make(map[string]string, len(schMap)*2)
 	for _, sc := range schMap {
-		nameMap[sc.Id] = sc.Name
+		nameMap[sc.Id.Hex()] = sc.Name
 	}
 	scCache = &scheduleCache{scMap: schMap, nameMap: nameMap}
 	return scCache

@@ -48,7 +48,6 @@ func CommandValueToReading(cv *ds_models.CommandValue, devName string) *e_models
 }
 
 func SendEvent(event *e_models.Event) {
-	LoggingClient.Error(fmt.Sprintf("TJM: Sending EVENT via eventclient for device: %v", event.Device))
 	_, err := EventClient.Add(event)
 	if err != nil {
 		LoggingClient.Error(fmt.Sprintf("Failed to push event for device %s: %v", event.Device, err))

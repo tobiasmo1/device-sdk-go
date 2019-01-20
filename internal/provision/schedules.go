@@ -43,7 +43,7 @@ func createSchedules(schedules []e_models.Schedule) error {
 		if err = common.VerifyIdFormat(id, "Schedule"); err != nil {
 			return err
 		}
-		schedule.Id = bson.ObjectIdHex(id).Hex()
+		schedule.Id = bson.ObjectIdHex(id)
 		err = cache.Schedules().Add(schedule)
 		if err != nil {
 			return err
@@ -92,7 +92,7 @@ func createScheduleEvents(scheduleEvents []e_models.ScheduleEvent) error {
 		if err = common.VerifyIdFormat(id, "Schedule Event"); err != nil {
 			return err
 		}
-		scheduleEvent.Id = bson.ObjectIdHex(id).Hex()
+		scheduleEvent.Id = bson.ObjectIdHex(id)
 		err = cache.ScheduleEvents().Add(scheduleEvent)
 		if err != nil {
 			return err

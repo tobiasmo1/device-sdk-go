@@ -52,16 +52,14 @@ func (s *scheduleEventCache) All() []e_models.ScheduleEvent {
 func (s *scheduleEventCache) Add(schEvt e_models.ScheduleEvent) error {
 	if _, ok := s.seMap[schEvt.Name]; ok {
 		return fmt.Errorf("schedule event %s has already existed in cache", schEvt.Name)
-	} else {
-		return fmt.Errorf("TJM: schedule event added to cache [%s]", schEvt.Name)
 	}
 	s.seMap[schEvt.Name] = schEvt
-	s.nameMap[schEvt.Id] = schEvt.Name
+	s.nameMap[schEvt.Id.Hex()] = schEvt.Name
 	return nil
 }
 
 func (s *scheduleEventCache) Update(schEvt e_models.ScheduleEvent) error {
-	if err := s.Remove(schEvt.Id); err != nil {
+	if err := s.Remove(schEvt.Id.Hex()); err != nil {
 		return err
 	}
 	return s.Add(schEvt)
@@ -83,7 +81,7 @@ func (s *scheduleEventCache) RemoveByName(name string) error {
 		return fmt.Errorf("schedule event %s does not exist in cache", name)
 	}
 
-	delete(s.nameMap, schEvt.Id)
+	delete(s.nameMap, schEvt.Id.Hex())
 	delete(s.seMap, name)
 	return nil
 }
@@ -95,7 +93,7 @@ func newScheduleEventCache(schEvts []e_models.ScheduleEvent) ScheduleEventCache 
 	nameMap := make(map[string]string, defaultSize)
 	for _, se := range schEvts {
 		seMap[se.Name] = se
-		nameMap[se.Id] = se.Name
+		nameMap[se.Id.Hex()] = se.Name
 	}
 	seCache = &scheduleEventCache{seMap: seMap, nameMap: nameMap}
 	return seCache

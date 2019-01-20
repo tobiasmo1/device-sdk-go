@@ -61,15 +61,10 @@ func execCmd(se *schEvtExec) {
 	vars := make(map[string]string, 2)
 	vars[nameVar] = deviceName
 	vars[commandVar] = cmdName
-	// TJM: sample invokes this using "turnOnSwitch" event; results in nil for evt though.. something about command handler stubbed maybe?
 	evt, appErr := handler.CommandHandler(vars, se.schEvt.Parameters, addr.HTTPMethod)
 	if appErr != nil {
 		common.LoggingClient.Error(fmt.Sprintf("Schecule Event %s execution failed, AppErr: %v", se.schEvt.Name, appErr))
 		return
-	}
-	if se.schEvt.Name == "readSwitch" {
-		common.LoggingClient.Info(fmt.Sprintf("TJM: Transforming JSON payload to prepare application/cbor"))
-
 	}
 	common.LoggingClient.Debug(fmt.Sprintf("Schecule Event %s executed result- Event: %v, AppErr: %v", se.schEvt.Schedule, evt, appErr))
 }

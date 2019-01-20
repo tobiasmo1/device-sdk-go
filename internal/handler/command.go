@@ -20,7 +20,6 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/transformer"
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
-	// TJM: TODO "github.com/ugorji/go/codec"
 )
 
 // Note, every HTTP request to ServeHTTP is made in a separate goroutine, which
@@ -134,7 +133,6 @@ func execReadCmd(device *e_models.Device, cmd string) (*e_models.Event, common.A
 		}
 
 		if common.CurrentConfig.Device.DataTransform {
-			common.LoggingClient.Error(fmt.Sprintf("TJM: Invoking TransformReadResult on device resource (devobject: %s for device: %s)  CommandValue (%s)", cv.RO.Object, device.Name, cv.String()))
 			err = transformer.TransformReadResult(cv, do.Properties.Value)
 			if err != nil {
 				common.LoggingClient.Error(fmt.Sprintf("Handler - execReadCmd: CommandValue (%s) transformed failed: %v", cv.String(), err))
@@ -177,9 +175,6 @@ func execReadCmd(device *e_models.Device, cmd string) (*e_models.Event, common.A
 		common.LoggingClient.Debug(fmt.Sprintf("Readings: %v", readings))
 		return nil, common.NewServerError(msg, nil)
 	}
-
-	// TJM: Transform Event (with Readings) to CBOR
-	common.LoggingClient.Error(fmt.Sprintf("TJM: Inject CBOR transformation for Event/Reading for dev: %s cmd: %s method: GET", device.Name, cmd))
 
 	// push to Core Data
 	event := &e_models.Event{Device: device.Name, Readings: readings}
@@ -238,7 +233,6 @@ func execWriteCmd(device *e_models.Device, cmd string, params string) common.App
 		reqs[i].DeviceObject = devObj
 
 		if common.CurrentConfig.Device.DataTransform {
-			common.LoggingClient.Error(fmt.Sprintf("TJM: Invoking TransformWriteParameter on device resource (devobject: %s for device: %s)  CommandValue (%s)", cv.RO.Object, device.Name, cv.String()))
 			err = transformer.TransformWriteParameter(cv, devObj.Properties.Value)
 			if err != nil {
 				msg := fmt.Sprintf("Handler - execWriteCmd: CommandValue (%s) transformed failed: %v", cv.String(), err)

@@ -14,7 +14,6 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
-	"github.com/globalsign/mgo/bson"
 )
 
 func LoadDevices(deviceList []common.DeviceConfig) error {
@@ -70,8 +69,7 @@ func createDevice(dc common.DeviceConfig) error {
 	if err = common.VerifyIdFormat(id, "Device"); err != nil {
 		return err
 	}
-	// TJM: Is provisioning an appropriate layer to validate id or just remove BSON dependency altogether?
-	device.Id = bson.ObjectIdHex(id).Hex()
+	device.Id = id
 	err = cache.Devices().Add(*device)
 
 	return err
