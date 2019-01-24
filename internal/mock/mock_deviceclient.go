@@ -11,7 +11,6 @@ import (
 	"fmt"
 
 	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
-	"github.com/globalsign/mgo/bson"
 )
 
 const (
@@ -44,7 +43,7 @@ func (dc *DeviceClientMock) Device(id string) (e_models.Device, error) {
 }
 
 func (dc *DeviceClientMock) DeviceForName(name string) (e_models.Device, error) {
-	var device = e_models.Device{Id: bson.ObjectIdHex("5b977c62f37ba10e36673802").Hex(), Name: name}
+	var device = e_models.Device{Id: "5b977c62f37ba10e36673802", Name: name}
 	var err error = nil
 	if name == "" {
 		err = errors.New("Item not found")
