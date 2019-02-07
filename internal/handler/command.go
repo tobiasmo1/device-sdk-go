@@ -203,13 +203,6 @@ func execWriteCmd(device *models.Device, cmd string, params string) common.AppEr
 		return common.NewServerError(msg, nil)
 	}
 
-	// NOTE that device-simple will register device-Simple01 and associate schedule(s) to 
-	// multiple IDs across runs. This appears to produce empty params for subsequent (non-existing) devices.
-	// tackle separately
-	if len(params) == 0 {
-		return common.NewBadRequestError("EMPTY PARAMETERS RECEIVED TO PUT CommandHandler.", nil)
-	}
-
 	roMap := roSliceToMap(ros)
 
 	cvs, err := parseWriteParams(device.Profile.Name, roMap, params)
