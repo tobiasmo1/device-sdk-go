@@ -75,7 +75,7 @@ func (s *SimpleDriver) HandleReadCommands(addr *models.Addressable, reqs []ds_mo
 }
 
 // HandleWriteCommands passes a slice of CommandRequest struct each representing
-// a ResourceOperation for a specific device resource.
+// a ResourceOperation for a specific device resource (aka DeviceResource).
 // Since the commands are actuation commands, params provide parameters for the individual
 // command.
 func (s *SimpleDriver) HandleWriteCommands(addr *models.Addressable, reqs []ds_models.CommandRequest,

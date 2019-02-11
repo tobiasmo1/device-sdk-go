@@ -96,15 +96,15 @@ func execReadCmd(device *models.Device, cmd string) (*models.Event, common.AppEr
 	reqs := make([]ds_models.CommandRequest, len(ros))
 
 	for i, op := range ros {
-		drName := op.Object
-		common.LoggingClient.Debug(fmt.Sprintf("Handler - execReadCmd: deviceResource: %s", drName))
+		objName := op.Object
+		common.LoggingClient.Debug(fmt.Sprintf("Handler - execReadCmd: deviceObject: %s", objName))
 
 		// TODO: add recursive support for resource command chaining. This occurs when a
 		// deviceprofile resource command operation references another resource command
 		// instead of a device resource (see BoschXDK for reference).
 
-		dr, ok := cache.Profiles().DeviceResource(device.Profile.Name, drName)
-		common.LoggingClient.Debug(fmt.Sprintf("Handler - execReadCmd: deviceResource: %v", dr))
+		devObj, ok := cache.Profiles().DeviceResource(device.Profile.Name, objName)
+		common.LoggingClient.Debug(fmt.Sprintf("Handler - execReadCmd: deviceObject: %v", devObj))
 		if !ok {
 			msg := fmt.Sprintf("Handler - execReadCmd: no deviceResource: %s for dev: %s cmd: %s method: GET", drName, device.Name, cmd)
 			common.LoggingClient.Error(msg)
@@ -112,7 +112,7 @@ func execReadCmd(device *models.Device, cmd string) (*models.Event, common.AppEr
 		}
 
 		reqs[i].RO = op
-		reqs[i].DeviceResource = dr
+		reqs[i].DeviceResource = devObj
 	}
 
 	results, err := common.Driver.HandleReadCommands(&device.Addressable, reqs)
@@ -125,7 +125,7 @@ func execReadCmd(device *models.Device, cmd string) (*models.Event, common.AppEr
 
 	for _, cv := range results {
 		// get the device resource associated with the rsp.RO
-		dr, ok := cache.Profiles().DeviceResource(device.Profile.Name, cv.RO.Object)
+		do, ok := cache.Profiles().DeviceResource(device.Profile.Name, cv.RO.Object)
 		if !ok {
 			msg := fmt.Sprintf("Handler - execReadCmd: no deviceResource: %s for dev: %s in Command Result %v", cv.RO.Object, device.Name, cv)
 			common.LoggingClient.Error(msg)
@@ -214,15 +214,15 @@ func execWriteCmd(device *models.Device, cmd string, params string) common.AppEr
 
 	reqs := make([]ds_models.CommandRequest, len(cvs))
 	for i, cv := range cvs {
-		drName := cv.RO.Object
-		common.LoggingClient.Debug(fmt.Sprintf("Handler - execWriteCmd: putting deviceResource: %s", drName))
+		objName := cv.RO.Object
+		common.LoggingClient.Debug(fmt.Sprintf("Handler - execWriteCmd: putting deviceObject: %s", objName))
 
 		// TODO: add recursive support for resource command chaining. This occurs when a
 		// deviceprofile resource command operation references another resource command
 		// instead of a device resource (see BoschXDK for reference).
 
-		dr, ok := cache.Profiles().DeviceResource(device.Profile.Name, drName)
-		common.LoggingClient.Debug(fmt.Sprintf("Handler - execWriteCmd: putting deviceResource: %v", dr))
+		devObj, ok := cache.Profiles().DeviceResource(device.Profile.Name, objName)
+		common.LoggingClient.Debug(fmt.Sprintf("Handler - execWriteCmd: putting deviceObject: %v", devObj))
 		if !ok {
 			msg := fmt.Sprintf("Handler - execWriteCmd: no deviceResource: %s for dev: %s cmd: %s method: GET", drName, device.Name, cmd)
 			common.LoggingClient.Error(msg)
@@ -230,7 +230,7 @@ func execWriteCmd(device *models.Device, cmd string, params string) common.AppEr
 		}
 
 		reqs[i].RO = *cv.RO
-		reqs[i].DeviceResource = dr
+		reqs[i].DeviceResource = devObj
 
 		if common.CurrentConfig.Device.DataTransform {
 			err = transformer.TransformWriteParameter(cv, dr.Properties.Value)
@@ -301,7 +301,7 @@ func createCommandValueForParam(profileName string, ro *models.ResourceOperation
 	var value interface{}
 	var t ds_models.ValueType
 
-	dr, ok := cache.Profiles().DeviceResource(profileName, ro.Object)
+	do, ok := cache.Profiles().DeviceResource(profileName, ro.Object)
 	if !ok {
 		msg := fmt.Sprintf("createCommandValueForParam: no deviceResource: %s", ro.Object)
 		common.LoggingClient.Error(msg)
