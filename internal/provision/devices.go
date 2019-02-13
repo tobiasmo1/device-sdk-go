@@ -61,7 +61,13 @@ func createDevice(dc common.DeviceConfig) error {
 	device.Origin = millis
 	device.Description = dc.Description
 	common.LoggingClient.Debug(fmt.Sprintf("Adding Device: %v", device))
-	id, err := common.DeviceClient.Add(device, nil)
+	// TJM NOTE: Temporary workaround for part of behavior caused by issue #171
+	// Here I'm explicitly deleting any device (e.g., such as device-Simple01
+	// created in previous run of device-simple) to avoid time consuming clean/restart regimen..
+	common.LoggingClient.Debug(fmt.Sprintf("Deleting Device Named: %v", dc.Name))
+	common.DeviceClient.DeleteByName(dc.Name)
+	// END
+	id, err := common.DeviceClient.Add(device)
 	if err != nil {
 		common.LoggingClient.Error(fmt.Sprintf("Add Device failed %v, error: %v", device, err))
 		return err
