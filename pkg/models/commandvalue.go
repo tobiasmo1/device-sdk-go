@@ -8,10 +8,12 @@
 package models
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
+	"github.com/ugorji/go/codec"
 	"io"
 	"strconv"
 
@@ -59,6 +61,9 @@ const (
 	// Float64 indicates that the value is a float64 that
 	// is stored in CommandValue's NumericRes member.
 	Float64
+	// Binary indicates that the value is a binary that
+	// is stored in CommandValue's ByteArrRes member.
+	Binary
 )
 
 type CommandValue struct {
@@ -81,6 +86,10 @@ type CommandValue struct {
 	NumericValue []byte
 	// stringValue is a string value returned as a value by a ProtocolDriver instance.
 	stringValue string
+	// binValue is a CBOR encoded binary value with a maximum
+	// capacity of 1MB, used to hold binary values returned
+	// by a ProtocolDriver instance.
+	binValue []byte
 }
 
 func NewBoolValue(ro *models.ResourceOperation, origin int64, value bool) (cv *CommandValue, err error) {
@@ -91,6 +100,11 @@ func NewBoolValue(ro *models.ResourceOperation, origin int64, value bool) (cv *C
 
 func NewStringValue(ro *models.ResourceOperation, origin int64, value string) (cv *CommandValue) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: String, stringValue: value}
+	return
+}
+
+func NewBinaryValue(ro *models.ResourceOperation, origin int64, value []byte) (cv *CommandValue, err error) {
+	cv = &CommandValue{RO: ro, Origin: origin, Type: Binary, binValue: value}
 	return
 }
 
@@ -167,10 +181,13 @@ func NewFloat64Value(ro *models.ResourceOperation, origin int64, value float64) 
 //NewCommandValue create a CommandValue according to the Type supplied
 func NewCommandValue(ro *models.ResourceOperation, origin int64, value interface{}, t ValueType) (cv *CommandValue, err error) {
 	cv = &CommandValue{RO: ro, Origin: origin, Type: t}
-	if t != String {
-		err = encodeValue(cv, value)
-	} else {
+	if t == Binary {
+		// assign cv.binValue
+		err = encodeBinaryValue(cv, value)
+	} else if t == String {
 		cv.stringValue = value.(string)
+	} else {
+		err = encodeValue(cv, value)
 	}
 	return
 }
@@ -272,6 +289,14 @@ func (cv *CommandValue) ValueToString() (str string) {
 		//binary.Read(reader, binary.BigEndian, &res)
 		//str = strconv.FormatFloat(res, 'f', -1, 64)
 		str = base64.StdEncoding.EncodeToString(cv.NumericValue)
+	case Binary:
+		str = "not supported"
+		bVal,err := cv.BinaryValue()
+		if err != nil {
+			str = err.Error()
+		}
+		// produce direct string representation of binary format
+		str = fmt.Sprintf("TJM DecodedBytes: \n\n% x\n\n\n", bVal)
 	}
 
 	return
@@ -309,6 +334,8 @@ func (cv *CommandValue) String() (str string) {
 		typeStr = "Float32: "
 	case Float64:
 		typeStr = "Float64: "
+	case Binary:
+		typeStr = "Binary: "
 	}
 
 	valueStr := typeStr + cv.ValueToString()
@@ -424,3 +451,41 @@ func (cv *CommandValue) Float64Value() (float64, error) {
 	err := decodeValue(bytes.NewReader(cv.NumericValue), &value)
 	return value, err
 }
+
+func (cv *CommandValue) BinaryValue() ([]byte, error) {
+	var value []byte
+	if cv.Type != Binary {
+		return value, fmt.Errorf("the CommandValue (%s) data type (%v) is not binary!", cv.String(), cv.Type)
+	}
+	err := decodeBinaryValue(bytes.NewReader(cv.binValue), &value)
+	return value, err
+}
+
+func encodeBinaryValue(cv *CommandValue, value interface{}) error {
+	buf := new(bytes.Buffer)
+	hCbor := new(codec.CborHandle)
+	enc := codec.NewEncoder(buf, hCbor)
+	err := enc.Encode(value)
+	if err == nil {
+		cv.binValue = buf.Bytes()
+	}
+	return err
+}
+
+func decodeBinaryValue(reader io.Reader, value interface{}) error {
+	// Provide a buffered reader for go-codec performance
+	var bufReader = bufio.NewReader(reader)
+	var h codec.Handle = new(codec.CborHandle)
+	// TODO: For efficiency, configure ReaderBufferSize on the handle
+	//  OR preconfigure our buffered reader (eg bufio.Reader, bytes.Buffer).
+	var dec *codec.Decoder = codec.NewDecoder(bufReader, h)
+	/* go/codec Decode will update the value passed.
+		If the value is a struct, it will update the fields that exist in the stream
+		If the value is a slice, it will update the slice to have a length equal to the length of items in the stream.
+		If the value is a map, it will update the entries in the map
+		If the value is a Func, it will be skipped (ignored)
+		Otherwise, the value is a primitive (number, bool, string) and is updated as such. */
+	var err error = dec.Decode(value)
+	return err
+}
+
