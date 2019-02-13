@@ -15,7 +15,7 @@ import (
 
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/edgex-go/pkg/clients/types"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	e_models "github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 func BuildAddr(host string, port string) string {
@@ -29,10 +29,20 @@ func BuildAddr(host string, port string) string {
 	return buffer.String()
 }
 
-func CommandValueToReading(cv *ds_models.CommandValue, devName string) *models.Reading {
-	reading := &models.Reading{Name: cv.RO.Parameter, Device: devName}
+func CommandValueToReading(cv *ds_models.CommandValue, devName string) *e_models.Reading {
+	// TJM: Requires updated edgex-go model -- which will need to export Reading.BinValue (or add getter/setter)
+	reading := &e_models.Reading{Name: cv.RO.Parameter, Device: devName}
 	reading.Value = cv.ValueToString()
-
+/*
+	LoggingClient.Info(fmt.Sprintf("TJM: Logging CommandValueToReading for device [%s] CommandValue.Reading.Value.Str[%s]", devName, reading.Value))
+	if cv.ValueType == Binary {
+		decodedBinVal,err := cv.BinaryValue()
+		if err != nil {
+			LoggingClient.Error(fmt.Sprintf("TJM: Error processing CommandValueToReading for device %s: %s", devName, err.Error()))
+			return reading
+		}
+		LoggingClient.Info(fmt.Sprintf("TJM: Decoded binValue for device %s: %x\n", devName, decodedBinVal))
+	}*/
 	// if value has a non-zero Origin, use it
 	if cv.Origin > 0 {
 		reading.Origin = cv.Origin

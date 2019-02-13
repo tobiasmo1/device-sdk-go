@@ -51,8 +51,25 @@ func (s *SimpleDriver) HandleReadCommands(addr *models.Addressable, reqs []ds_mo
 
 	res = make([]*ds_models.CommandValue, 1)
 	now := time.Now().UnixNano() / int64(time.Millisecond)
-	cv, _ := ds_models.NewBoolValue(&reqs[0].RO, now, s.switchButton)
-	res[0] = cv
+
+	fmt.Printf("TJM: HandleReadCommands in device-sdk-go/driver/simpledriver.\nSwitchButtonVal: %v\n\n", s.switchButton)
+	// mock new binary value to be encoded
+	b := make([]byte, 1)
+	b[0] = 0
+	if s.switchButton == true {
+		b[0] = 1
+	}
+	/* mock alternate binary values
+	b := make([]byte, 4)
+	binary.LittleEndian.PutUint16(b[0:], 0x03e8)
+	binary.LittleEndian.PutUint16(b[2:], 0x07d0)
+	*/
+	fmt.Printf("TJM: OriginBytes: \n\n% x\n\n\n", b)
+	
+	cvb, _ := ds_models.NewBinaryValue(&reqs[0].RO, now, b)
+	//cv, _ := ds_models.NewBoolValue(&reqs[0].RO, now, s.switchButton)
+
+	res[0] = cvb
 
 	return
 }
