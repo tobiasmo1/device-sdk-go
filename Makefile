@@ -1,4 +1,4 @@
-.PHONY: build test clean docker
+.PHONY: build test clean docker prepare update
 
 GO=CGO_ENABLED=0 GO111MODULE=on go
 
@@ -30,3 +30,9 @@ test:
 
 clean:
 	rm -f $(MICROSERVICES)
+
+prepare:
+	glide install
+
+update:
+	glide update
