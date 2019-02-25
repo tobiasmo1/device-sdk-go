@@ -8,12 +8,14 @@
 package provision
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/google/uuid"
 )
 
 func LoadDevices(deviceList []common.DeviceConfig) error {
@@ -60,16 +62,14 @@ func createDevice(dc common.DeviceConfig) error {
 	}
 	device.Origin = millis
 	device.Description = dc.Description
-	common.LoggingClient.Debug(fmt.Sprintf("Adding Device: %v", device))
-
+	ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
 	// TJM NOTE: Temporary workaround for part of behavior caused by issue #171
 	// Here I'm explicitly deleting any device (e.g., such as device-Simple01
 	// created in previous run of device-simple) to avoid time consuming clean/restart regimen..
-	common.LoggingClient.Debug(fmt.Sprintf("Deleting Device Named: %v", dc.Name))
-	common.DeviceClient.DeleteByName(dc.Name)
-	// END
-
-	id, err := common.DeviceClient.Add(device)
+	//common.LoggingClient.Debug(fmt.Sprintf("Deleting Device Named: %v", dc.Name))
+	//common.DeviceClient.DeleteByName(dc.Name, ctx)
+	common.LoggingClient.Debug(fmt.Sprintf("Adding Device: %v", device))
+	id, err := common.DeviceClient.Add(device, ctx)
 	if err != nil {
 		common.LoggingClient.Error(fmt.Sprintf("Add Device failed %v, error: %v", device, err))
 		return err

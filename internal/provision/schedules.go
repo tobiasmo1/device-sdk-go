@@ -8,12 +8,13 @@
 package provision
 
 import (
+	"context"
 	"fmt"
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 
+	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
-	"github.com/globalsign/mgo/bson"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/google/uuid"
 )
 
 func LoadSchedulesAndEvents(config *common.Config) error {
@@ -35,7 +36,8 @@ func createSchedules(schedules []models.Schedule) error {
 			continue
 		}
 
-		id, err := common.ScheduleClient.Add(&schedule, nil)
+		ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
+		id, err := common.ScheduleClient.Add(&schedule, ctx)
 		if err != nil {
 			common.LoggingClient.Error(fmt.Sprintf("Add schedule (%v) fail: %v", schedule.Name, err.Error()))
 			return err
@@ -43,7 +45,7 @@ func createSchedules(schedules []models.Schedule) error {
 		if err = common.VerifyIdFormat(id, "Schedule"); err != nil {
 			return err
 		}
-		schedule.Id = bson.ObjectIdHex(id)
+		schedule.Id = id
 		err = cache.Schedules().Add(schedule)
 		if err != nil {
 			return err
@@ -59,7 +61,8 @@ func isScheduleExist(scheduleName string) bool {
 		return true
 	}
 	// confirm from Core Metadata
-	if _, err := common.ScheduleClient.ScheduleForName(scheduleName, nil); err == nil {
+	ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
+	if _, err := common.ScheduleClient.ScheduleForName(scheduleName, ctx); err == nil {
 		return true
 	} else {
 		return false
@@ -84,7 +87,8 @@ func createScheduleEvents(scheduleEvents []models.ScheduleEvent) error {
 			return err
 		}
 
-		id, err := common.ScheduleEventClient.Add(&scheduleEvent, nil)
+		ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
+		id, err := common.ScheduleEventClient.Add(&scheduleEvent, ctx)
 		if err != nil {
 			common.LoggingClient.Error(fmt.Sprintf("Add schedule event (%v) fail: %v", scheduleEvent.Name, err.Error()))
 			return err
@@ -92,7 +96,7 @@ func createScheduleEvents(scheduleEvents []models.ScheduleEvent) error {
 		if err = common.VerifyIdFormat(id, "Schedule Event"); err != nil {
 			return err
 		}
-		scheduleEvent.Id = bson.ObjectIdHex(id)
+		scheduleEvent.Id = id
 		err = cache.ScheduleEvents().Add(scheduleEvent)
 		if err != nil {
 			return err
@@ -117,7 +121,8 @@ func createScheduleEventAddressable(scheduleEvent *models.ScheduleEvent) error {
 		scheduleEvent.Addressable.HTTPMethod = "GET"
 	}
 
-	addressableId, err := common.AddressableClient.Add(&scheduleEvent.Addressable, nil)
+	ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
+	addressableId, err := common.AddressableClient.Add(&scheduleEvent.Addressable, ctx)
 	if err != nil {
 		return err
 	}
@@ -131,7 +136,8 @@ func createScheduleEventAddressable(scheduleEvent *models.ScheduleEvent) error {
 
 func isScheduleEventAddressableExist(addressableName string) bool {
 	isExist := true
-	addressable, _ := common.AddressableClient.AddressableForName(addressableName, nil)
+	ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
+	addressable, _ := common.AddressableClient.AddressableForName(addressableName, ctx)
 	if addressable.Name == "" {
 		isExist = false
 	}
@@ -144,7 +150,8 @@ func isScheduleEventExist(scheduleEventName string) bool {
 		return true
 	}
 	// confirm from Core Metadata
-	if _, err := common.ScheduleEventClient.ScheduleEventForName(scheduleEventName, nil); err == nil {
+	ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
+	if _, err := common.ScheduleEventClient.ScheduleEventForName(scheduleEventName, ctx); err == nil {
 		return true
 	} else {
 		return false

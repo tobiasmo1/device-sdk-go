@@ -7,6 +7,10 @@
 
 package common
 
+import (
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+)
+
 const (
 	ClientData     = "Data"
 	ClientMetadata = "Metadata"
@@ -25,4 +29,6 @@ const (
 	APIPingRoute            = APIv1Prefix + "/ping"
 
 	SchedulerExecCMDPattern = APIv1Prefix + "/device/name/*/*"
+
+	CorrelationHeader = clients.CorrelationHeader
 )
