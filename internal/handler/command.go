@@ -97,14 +97,14 @@ func execReadCmd(device *models.Device, cmd string) (*models.Event, common.AppEr
 
 	for i, op := range ros {
 		drName := op.Object
-		common.LoggingClient.Debug(fmt.Sprintf("Handler - execReadCmd: deviceResource: %s", objName))
+		common.LoggingClient.Debug(fmt.Sprintf("Handler - execReadCmd: deviceResource: %s", drName))
 
 		// TODO: add recursive support for resource command chaining. This occurs when a
 		// deviceprofile resource command operation references another resource command
 		// instead of a device resource (see BoschXDK for reference).
 
 		dr, ok := cache.Profiles().DeviceResource(device.Profile.Name, drName)
-		common.LoggingClient.Debug(fmt.Sprintf("Handler - execReadCmd: deviceResource: %v", devObj))
+		common.LoggingClient.Debug(fmt.Sprintf("Handler - execReadCmd: deviceResource: %v", dr))
 		if !ok {
 			msg := fmt.Sprintf("Handler - execReadCmd: no deviceResource: %s for dev: %s cmd: %s method: GET", drName, device.Name, cmd)
 			common.LoggingClient.Error(msg)
@@ -203,9 +203,9 @@ func execWriteCmd(device *models.Device, cmd string, params string) common.AppEr
 		return common.NewServerError(msg, nil)
 	}
 
-	// NOTE that device-simple will register device-Simple01 and associate schedule(s) to 
+	// TJM: tackle separately
+	// I find that device-simple will register device-Simple01 and associate schedule(s) to 
 	// multiple IDs across runs. This appears to produce empty params for subsequent (non-existing) devices.
-	// tackle separately
 	if len(params) == 0 {
 		return common.NewBadRequestError("EMPTY PARAMETERS RECEIVED TO PUT CommandHandler.", nil)
 	}
@@ -222,14 +222,14 @@ func execWriteCmd(device *models.Device, cmd string, params string) common.AppEr
 	reqs := make([]ds_models.CommandRequest, len(cvs))
 	for i, cv := range cvs {
 		drName := cv.RO.Object
-		common.LoggingClient.Debug(fmt.Sprintf("Handler - execWriteCmd: putting deviceResource: %s", objName))
+		common.LoggingClient.Debug(fmt.Sprintf("Handler - execWriteCmd: putting deviceResource: %s", drName))
 
 		// TODO: add recursive support for resource command chaining. This occurs when a
 		// deviceprofile resource command operation references another resource command
 		// instead of a device resource (see BoschXDK for reference).
 
 		dr, ok := cache.Profiles().DeviceResource(device.Profile.Name, drName)
-		common.LoggingClient.Debug(fmt.Sprintf("Handler - execWriteCmd: putting deviceResource: %v", devObj))
+		common.LoggingClient.Debug(fmt.Sprintf("Handler - execWriteCmd: putting deviceResource: %v", dr))
 		if !ok {
 			msg := fmt.Sprintf("Handler - execWriteCmd: no deviceResource: %s for dev: %s cmd: %s method: GET", drName, device.Name, cmd)
 			common.LoggingClient.Error(msg)
