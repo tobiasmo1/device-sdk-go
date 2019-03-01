@@ -19,7 +19,7 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	"github.com/edgexfoundry/device-sdk-go/internal/transformer"
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/edgexfoundry/edgex-go/pkg/models"
 )
 
 // Note, every HTTP request to ServeHTTP is made in a separate goroutine, which
@@ -203,13 +203,6 @@ func execWriteCmd(device *models.Device, cmd string, params string) common.AppEr
 		return common.NewServerError(msg, nil)
 	}
 
-	// TJM: tackle separately
-	// I find that device-simple will register device-Simple01 and associate schedule(s) to 
-	// multiple IDs across runs. This appears to produce empty params for subsequent (non-existing) devices.
-	if len(params) == 0 {
-		return common.NewBadRequestError("EMPTY PARAMETERS RECEIVED TO PUT CommandHandler.", nil)
-	}
-
 	roMap := roSliceToMap(ros)
 
 	cvs, err := parseWriteParams(device.Profile.Name, roMap, params)
@@ -259,13 +252,19 @@ func execWriteCmd(device *models.Device, cmd string, params string) common.AppEr
 }
 
 func parseWriteParams(profileName string, roMap map[string]*models.ResourceOperation, params string) ([]*ds_models.CommandValue, error) {
+<<<<<<< 75449a9932cfdfd2f2453ac1a4ba1db0f0d9b20b
 	var paramMap map[string]string
 	err := json.Unmarshal([]byte(params), &paramMap)
+=======
+	var paramMaps []map[string]string
+	err := json.Unmarshal([]byte(params), &paramMaps)
+>>>>>>> Use DeviceResources instead of ValueDescriptors for consistency
 	if err != nil {
 		common.LoggingClient.Error(fmt.Sprintf("Handler - parseWriteParams: parsing Write parameters failed %s, %v", params, err))
 		return []*ds_models.CommandValue{}, err
 	}
 
+<<<<<<< 75449a9932cfdfd2f2453ac1a4ba1db0f0d9b20b
 	result := make([]*ds_models.CommandValue, 0, len(paramMap))
 	for k, v := range paramMap {
 		ro, ok := roMap[k]
@@ -274,13 +273,32 @@ func parseWriteParams(profileName string, roMap map[string]*models.ResourceOpera
 				newV, ok := ro.Mappings[v]
 				if ok {
 					v = newV
+=======
+	result := make([]*ds_models.CommandValue, 0, len(paramMaps))
+	for _, m := range paramMaps {
+		for k, v := range m {
+			ro, ok := roMap[k]
+			if ok {
+				if len(ro.Mappings) > 0 {
+					newV, ok := ro.Mappings[v]
+					if ok {
+						v = newV
+					} else {
+						msg := fmt.Sprintf("Handler - parseWriteParams: Resource Operation (%v) mapping value (%s) failed with the mapping table: %v", ro, v, ro.Mappings)
+						common.LoggingClient.Warn(msg)
+						//return result, fmt.Errorf(msg) // issue #89 will discuss how to handle there is no mapping matched
+					}
+				}
+				cv, err := createCommandValueForParam(profileName, ro, v)
+				if err == nil {
+					result = append(result, cv)
+>>>>>>> Use DeviceResources instead of ValueDescriptors for consistency
 				} else {
 					msg := fmt.Sprintf("Handler - parseWriteParams: Resource Operation (%v) mapping value (%s) failed with the mapping table: %v", ro, v, ro.Mappings)
 					common.LoggingClient.Warn(msg)
 					//return result, fmt.Errorf(msg) // issue #89 will discuss how to handle there is no mapping matched
 				}
 			}
-			// Here we transform the value descriptor to binary..
 			cv, err := createCommandValueForParam(profileName, ro, v)
 			if err == nil {
 				result = append(result, cv)
@@ -309,16 +327,26 @@ func createCommandValueForParam(profileName string, ro *models.ResourceOperation
 	var value interface{}
 	var t ds_models.ValueType
 
+<<<<<<< 75449a9932cfdfd2f2453ac1a4ba1db0f0d9b20b
 	dr, ok := cache.Profiles().DeviceResource(profileName, ro.Object)
 	if !ok {
 		msg := fmt.Sprintf("createCommandValueForParam: no deviceResource: %s", ro.Object)
+=======
+	do, ok := cache.Profiles().DeviceObject(profileName, ro.Object)
+	if !ok {
+		msg := fmt.Sprintf("createCommandValueForParam: no devobject: %s", ro.Object)
+>>>>>>> Use DeviceResources instead of ValueDescriptors for consistency
 		common.LoggingClient.Error(msg)
 		return nil, fmt.Errorf(msg)
 	}
 
 	origin := time.Now().UnixNano() / int64(time.Millisecond)
 
+<<<<<<< 75449a9932cfdfd2f2453ac1a4ba1db0f0d9b20b
 	switch strings.ToLower(dr.Properties.Value.Type) {
+=======
+	switch strings.ToLower(do.Properties.Value.Type) {
+>>>>>>> Use DeviceResources instead of ValueDescriptors for consistency
 	case "bool":
 		value, err = strconv.ParseBool(v)
 		t = ds_models.Bool
@@ -369,12 +397,14 @@ func createCommandValueForParam(profileName string, ro *models.ResourceOperation
 	case "float64":
 		value, err = strconv.ParseFloat(v, 64)
 		t = ds_models.Float64
-	case "binary":
-		t = ds_models.Binary
 	}
 
 	if err != nil {
+<<<<<<< 75449a9932cfdfd2f2453ac1a4ba1db0f0d9b20b
 		common.LoggingClient.Error(fmt.Sprintf("Handler - Command: Parsing parameter value (%s) to %s failed: %v", v, dr.Properties.Value.Type, err))
+=======
+		common.LoggingClient.Error(fmt.Sprintf("Handler - Command: Parsing parameter value (%s) to %s failed: %v", v, do.Properties.Value.Type, err))
+>>>>>>> Use DeviceResources instead of ValueDescriptors for consistency
 		return result, err
 	}
 

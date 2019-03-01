@@ -19,5 +19,6 @@ require (
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/robfig/cron v0.0.0-20180505203441-b41be1df6967
+	github.com/ugorji/go/codec v0.0.0-20190204201341-e444a5086c43
 	gopkg.in/yaml.v2 v2.0.0-20170812160011-eb3733d160e7
 )

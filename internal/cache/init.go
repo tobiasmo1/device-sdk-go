@@ -46,6 +46,10 @@ func InitCache() {
 		newProfileCache(dps)
 
 		ses, err := common.ScheduleEventClient.ScheduleEventsForServiceByName(common.ServiceName, ctx)
+
+		// core-contracts should be returning HTTPMethod on above call to "ScheduleEventsForServiceByName"
+		// so manually stitching on in "newScheduleEventCache" to prove out downstream
+
 		if err != nil {
 			common.LoggingClient.Error(fmt.Sprintf("Schedule Event cache initialization failed: %v", err))
 			ses = make([]models.ScheduleEvent, 0)

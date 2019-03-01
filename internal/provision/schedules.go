@@ -75,6 +75,16 @@ func createScheduleEvents(scheduleEvents []models.ScheduleEvent) error {
 		if scheduleEvent.Service == "" {
 			scheduleEvent.Service = common.ServiceName
 		}
+// handle case where sched event exists with addressable that is empty
+		//if scheduleEvent.Addressable != nil {
+/*			if scheduleEvent.Addressable.HTTPMethod == "" {
+				scheduleEvent.Addressable.HTTPMethod = "GET"
+				common.LoggingClient.Error(fmt.Sprintf("TJM : POPULATING EMPTY Addressable.HTTPMethod for SchedEventAddr (%v). Method assigned: %v", scheduleEvent.Addressable.Name, scheduleEvent.Addressable.HTTPMethod))
+			} else {
+				common.LoggingClient.Error(fmt.Sprintf("TJM : Addressable.HTTPMethod ALREADY POPULATED for SchedEventAddr (%v). Method assigned: %v", scheduleEvent.Addressable.Name, scheduleEvent.Addressable.HTTPMethod))
+			}
+			*/
+		//}
 
 		if isScheduleEventExist(scheduleEvent.Name) {
 			common.LoggingClient.Info(fmt.Sprintf("Schedule evnt (%v) exist", scheduleEvent.Name))

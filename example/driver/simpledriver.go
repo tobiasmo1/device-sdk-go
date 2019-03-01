@@ -52,8 +52,8 @@ func (s *SimpleDriver) HandleReadCommands(addr *models.Addressable, reqs []ds_mo
 	res = make([]*ds_models.CommandValue, 1)
 	now := time.Now().UnixNano() / int64(time.Millisecond)
 
-	fmt.Printf("TJM: HandleReadCommands in device-sdk-go/driver/simpledriver.\nSwitchButtonVal: %v\n\n", s.switchButton)
-	// mock new binary value to be encoded
+	s.lc.Debug(fmt.Sprintf("\nCurrent SwitchButtonVal: %v\n\n", s.switchButton))
+	// mock new binary value to be sent
 	b := make([]byte, 1)
 	b[0] = 0
 	if s.switchButton == true {
@@ -96,6 +96,25 @@ func (s *SimpleDriver) HandleWriteCommands(addr *models.Addressable, reqs []ds_m
 		err := fmt.Errorf("SimpleDriver.HandleWriteCommands; the data type of parameter should be Boolean, parameter: %s", params[0].String())
 		return err
 	}
+
+	// mock new binary value to be sent
+	b := make([]byte, 1)
+	b[0] = 0
+	if s.switchButton == true {
+		b[0] = 1
+	}
+	/* mock alternate binary values
+	b := make([]byte, 4)
+	binary.LittleEndian.PutUint16(b[0:], 0x03e8)
+	binary.LittleEndian.PutUint16(b[2:], 0x07d0)
+	*/
+	fmt.Printf("TJM: PUT OriginBytes: \n\n% x\n\n\n", b)
+
+	// TJM already allocated by caller - res = make([]*ds_models.CommandValue, 1)
+	now := time.Now().UnixNano() / int64(time.Millisecond)
+	cvb, _ := ds_models.NewBinaryValue(&reqs[0].RO, now, b)
+
+	params[0] = cvb
 
 	return nil
 }

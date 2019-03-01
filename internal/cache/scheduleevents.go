@@ -91,6 +91,19 @@ func newScheduleEventCache(schEvts []models.ScheduleEvent) ScheduleEventCache {
 	seMap := make(map[string]models.ScheduleEvent, defaultSize)
 	nameMap := make(map[string]string, defaultSize)
 	for _, se := range schEvts {
+		// METHODS ARE MISSING!
+		if se.Addressable.HTTPMethod == "" {
+			if se.Name == "readSwtich" {
+				se.Addressable.HTTPMethod = "GET"
+				fmt.Println("TJM: MANUALLY STITCHED HTTPMethod onto 'readSwtich' ScheduleEvent.")
+			} else if se.Name == "turnOnSwitch" {
+				se.Addressable.HTTPMethod = "PUT"
+				fmt.Println("TJM: MANUALLY STITCHED HTTPMethod onto 'readSwtich' ScheduleEvent.")
+			} else {
+				fmt.Println("TJM: DID NOT MANUALLY STITCH missing HTTPMethod onto this ScheduleEvent.")
+			}
+		}
+		// END METHODS ARE MISSING!
 		seMap[se.Name] = se
 		nameMap[se.Id] = se.Name
 	}

@@ -10,6 +10,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+//	cbor "github.com/ugorji/go/codec"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -24,6 +25,7 @@ const (
 	statusOK          string = "OK"
 	headerContentType string = "Content-Type"
 	contentTypeJson   string = "application/json"
+	contentTypeCbor   string = "application/cbor"
 )
 
 func statusFunc(w http.ResponseWriter, req *http.Request) {
@@ -96,8 +98,21 @@ func commandFunc(w http.ResponseWriter, req *http.Request) {
 	if appErr != nil {
 		http.Error(w, fmt.Sprintf("%s %s", appErr.Message(), req.URL.Path), appErr.Code())
 	} else if event != nil {
-		w.Header().Set(headerContentType, contentTypeJson)
-		json.NewEncoder(w).Encode(event)
+		//if (isBinValue) {
+			w.Header().Set(headerContentType, contentTypeJson)
+			json.NewEncoder(w).Encode(event)
+		/*} else {
+			  Create and initialize the Handle before any use.
+				  Once created, DO NOT modify it.
+				- Multiple Encoders or Decoders can now use the Handle concurrently.
+				  They only read information off the Handle (never write).
+				- However, each Encoder or Decoder MUST not be used concurrently
+				- To re-use an Encoder/Decoder, call Reset(...) on it first.
+				  This allows you use state maintained on the Encoder/Decoder.
+			w.Header().Set(headerContentType, contentTypeCbor)
+			cbor.Encoder{}.NewEncoder(w).Encode(event)
+
+		}*/
 	}
 }
 

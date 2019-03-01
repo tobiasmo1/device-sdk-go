@@ -66,7 +66,7 @@ Level = "DEBUG"
 # Pre-define Schedule Configuration
 [[Schedules]]
 Name = "10sec-schedule"
-Frequency = "PT10S"
+Frequency = "PT10M"
 
 [[ScheduleEvents]]
 Name = "turnOnSwitch"
@@ -78,7 +78,7 @@ Schedule = "10sec-schedule"
 
 [[Schedules]]
 Name = "5sec-schedule"
-Frequency = "PT5S"
+Frequency = "PT5M"
 
 [[ScheduleEvents]]
 Name = "readSwtich"

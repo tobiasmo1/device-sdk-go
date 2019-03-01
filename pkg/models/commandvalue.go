@@ -296,7 +296,7 @@ func (cv *CommandValue) ValueToString() (str string) {
 			str = err.Error()
 		}
 		// produce direct string representation of binary format
-		str = fmt.Sprintf("TJM DecodedBytes: \n\n% x\n\n\n", bVal)
+		str = fmt.Sprintf("% x\n", bVal)
 	}
 
 	return
