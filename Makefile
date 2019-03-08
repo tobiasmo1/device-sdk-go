@@ -19,10 +19,12 @@ example/cmd/device-simple/device-simple:
 
 docker:
 	docker build \
-		-f docker/Dockerfile \
+		-f example/cmd/device-simple/Dockerfile \
 		--label "git_sha=$(GIT_SHA)" \
 		-t edgexfoundry/docker-device-sdk-simple:$(GIT_SHA) \
 		-t edgexfoundry/docker-device-sdk-simple:$(VERSION)-dev \
+		--build-arg http_proxy=${HTTP_PROXY} \
+		--build-arg https_proxy=${HTTPS_PROXY} \
 		.
 
 test:

@@ -1,3 +1,6 @@
+[Writable]
+LogLevel = 'INFO'
+
 [Service]
 Host = "localhost"
 Port = 49990
@@ -12,6 +15,7 @@ AsyncBufferSize = 16
 [Registry]
 Host = "localhost"
 Port = 8500
+Type = "consul"
 CheckInterval = "10s"
 FailLimit = 3
 FailWaitTime = 10
@@ -50,7 +54,6 @@ FailWaitTime = 10
 [Logging]
 EnableRemote = false
 File = "./device-simple.log"
-Level = "DEBUG"
 
 # Pre-define Devices
 [[DeviceList]]
@@ -66,7 +69,7 @@ Level = "DEBUG"
 # Pre-define Schedule Configuration
 [[Schedules]]
 Name = "10sec-schedule"
-Frequency = "PT10M"
+Frequency = "PT10S"
 
 [[ScheduleEvents]]
 Name = "turnOnSwitch"
@@ -78,7 +81,7 @@ Schedule = "10sec-schedule"
 
 [[Schedules]]
 Name = "5sec-schedule"
-Frequency = "PT5M"
+Frequency = "PT5S"
 
 [[ScheduleEvents]]
 Name = "readSwtich"

@@ -1,32 +1,41 @@
 #
-# Copyright (c) 2018
-# Intel
+# Copyright (c) 2018, 2019 Intel
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 FROM golang:1.11-alpine AS builder
 
+ENV GO111MODULE=on
+WORKDIR /go/src/github.com/edgexfoundry/device-sdk-go
+
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
-  copyright='Copyright (c) 2018: Intel'
+  copyright='Copyright (c) 2018, 2019: Intel'
 
 RUN sed -e 's/dl-cdn[.]alpinelinux.org/nl.alpinelinux.org/g' -i~ /etc/apk/repositories
 
 # add git for go modules
-RUN apk add --update --no-cache make git gcc libc-dev
+RUN apk update && apk add make git
 
-WORKDIR /github.com/edgexfoundry/device-sdk-go
+COPY go.mod .
 
-COPY . /github.com/edgexfoundry/device-sdk-go/
+RUN go mod download
+
+COPY . .
 
 RUN make build
 
 # Next image - Copy built Go binary into new workspace
-# Maybe use FROM scratch for Go binaries??
-FROM alpine:3.7
+FROM scratch
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
-  copyright='Copyright (c) 2018: Intel'
+  copyright='Copyright (c) 2018, 2019: Intel'
 
-COPY --from=builder /github.com/edgexfoundry/device-sdk-go/example/cmd/device-simple/device-simple /usr/local/bin/device-simple
+ENV APP_PORT=49990
+#expose command data port
+EXPOSE $APP_PORT
 
-CMD [ "/usr/local/bin/device-simple" ]
+WORKDIR /
+COPY --from=builder /go/src/github.com/edgexfoundry/device-sdk-go/example/cmd/device-simple/device-simple /usr/local/bin/device-simple
+COPY --from=builder /go/src/github.com/edgexfoundry/device-sdk-go/example/cmd/device-simple/res/docker/configuration.toml /res/docker/configuration.toml
+
+CMD [ "/usr/local/bin/device-simple","--registry","--profile=docker","--confdir=/res"]
