@@ -68,12 +68,23 @@ func processAsyncResults() {
 			readings = append(readings, *reading)
 		}
 
-		// push to Core Data
-		event := &models.Event{Device: acv.DeviceName, Readings: readings}
-		ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
-		_, err := common.EventClient.Add(event, ctx)
-		if err != nil {
-			common.LoggingClient.Error(fmt.Sprintf("processAsyncResults - Failed to push event %v: %v", event, err))
+		var sendBinary = true
+		if sendBinary {
+			// locally perform push to Core Data using binary data
+			event := &models.Event{Device: acv.DeviceName, Readings: readings}
+			ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
+			_, err := common.EventClient.Add(event, ctx)
+			if err != nil {
+				common.LoggingClient.Error(fmt.Sprintf("processAsyncResults - Failed to push event %v: %v", event, err))
+			}
+		} else {
+			// push to Core Data
+			event := &models.Event{Device: acv.DeviceName, Readings: readings}
+			ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
+			_, err := common.EventClient.Add(event, ctx)
+			if err != nil {
+				common.LoggingClient.Error(fmt.Sprintf("processAsyncResults - Failed to push event %v: %v", event, err))
+			}
 		}
 	}
 }
