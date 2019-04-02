@@ -34,7 +34,7 @@ require (
 	github.com/posener/complete v1.2.1 // indirect
 	github.com/robfig/cron v0.0.0-20180505203441-b41be1df6967
 	github.com/stretchr/objx v0.1.1 // indirect
-	github.com/ugorji/go/codec v0.0.0-20190320090025-2dc34c0b8780 // indirect
+	github.com/ugorji/go/codec v0.0.0-20190320090025-2dc34c0b8780
 	golang.org/x/crypto v0.0.0-20190320223903-b7391e95e576 // indirect
 	golang.org/x/net v0.0.0-20190324223953-e3b2ff56ed87 // indirect
 	golang.org/x/sync v0.0.0-20190227155943-e225da77a7e6 // indirect

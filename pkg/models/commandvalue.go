@@ -87,8 +87,9 @@ type CommandValue struct {
 	stringValue string
 	// binValue is a CBOR encoded binary value with a maximum
 	// capacity of 1MB, used to hold binary values returned
-	// by a ProtocolDriver instance.
-	binValue []byte
+	// by a ProtocolDriver instance. It is externally accessed
+	// using BinaryValue() method
+	BinValue []byte
 }
 
 func NewBoolValue(ro *models.ResourceOperation, origin int64, value bool) (cv *CommandValue, err error) {
@@ -188,7 +189,7 @@ func NewCommandValue(ro *models.ResourceOperation, origin int64, value interface
 
 // NewBinaryValue creates a CommandValue with binary payload.
 func NewBinaryValue(ro *models.ResourceOperation, origin int64, value []byte) (cv *CommandValue, err error) {
-	cv = &CommandValue{RO: ro, Origin: origin, Type: Binary, binValue: value}
+	cv = &CommandValue{RO: ro, Origin: origin, Type: Binary, BinValue: value}
 	return
 }
 
@@ -457,7 +458,7 @@ func (cv *CommandValue) BinaryValue() ([]byte, error) {
 	if cv.Type != Binary {
 		return value, fmt.Errorf("the CommandValue (%s) data type (%v) is not binary!", cv.String(), cv.Type)
 	}
-	err := decodeBinaryValue(bytes.NewReader(cv.binValue), &value)
+	err := decodeBinaryValue(bytes.NewReader(cv.BinValue), &value)
 	return value, err
 }
 
@@ -467,7 +468,7 @@ func encodeBinaryValue(cv *CommandValue, value interface{}) error {
 	enc := codec.NewEncoder(buf, hCbor)
 	err := enc.Encode(value)
 	if err == nil {
-		cv.binValue = buf.Bytes()
+		cv.BinValue = buf.Bytes()
 	}
 	return err
 }
